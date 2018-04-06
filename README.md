@@ -50,7 +50,7 @@ export default class App extends React.Component {
         onClick={this.onClickGetBar}
         ref={createElementRef(this, "element")}
       >
-        Let's get bar!
+        Go get bar!
       </button>
     );
   }
@@ -119,7 +119,7 @@ export default class App extends Component {
   render() {
     return (
       <SomeOtherComponent ref={createComponentRef(this, "component")}>
-        Let's capture the component instance!
+        We captured the component instance!
       </SomeOtherComponent>
     );
   }
@@ -144,7 +144,7 @@ export default class App extends Component {
   render() {
     return (
       <SomeOtherComponent ref={createElementRef(this, "element")}>
-        Let's find the DOM node!
+        We found the DOM node!
       </SomeOtherComponent>
     );
   }
