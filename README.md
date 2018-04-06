@@ -23,15 +23,11 @@ Handle react classes with more functional purity
 import React from "react";
 import { createElementRef, createMethod } from "react-parm";
 
-export const componentDidMount = ({ getFoo, props }) => {
-  if (props.shouldGetFoo) {
-    getFoo();
-  }
-};
+export const componentDidMount = ({ getFoo, props }) =>
+  props.shouldGetFoo && getFoo();
 
-export const onClickGetBar = ({ getBar }, [event]) => {
+export const onClickGetBar = ({ getBar }, [event]) =>
   getBar(event.currentTarget.dataset.baz);
-};
 
 export default class App extends React.Component {
   // lifecycle methods
@@ -75,6 +71,14 @@ export const componentDidMount = ({ setState }) =>
 export const onClickDoThing = ({ props }, [event], [withStuff]) =>
   props.doThing(event.currentTarget, withStuff);
 
+export const render = ({ onClickDoThing }) => (
+  <div>
+    <h3>All methods are supported!</h3>
+
+    <button onClick={onClickDoThing}>Do the thing</button>
+  </div>
+);
+
 export default class App extends Component {
   state = {
     isMounted: false
@@ -82,26 +86,19 @@ export default class App extends Component {
 
   componentDidMount = createMethod(this, componentDidMount);
   onClickDoThing = createMethod(this, onClickDoThing, true);
-
-  render() {
-    return (
-      <div>
-        <h3>Both lifecycle and instance methods are supported!</h3>
-
-        <button onClick={this.onClickDoThing}>Do the thing</button>
-      </div>
-    );
-  }
+  render = createMethod(this, render);
 }
 ```
 
-There are three parameters passed to the `method` you provide as the second parameter:
+There are three parameters passed to the `method` you provide:
 
 * instance `ReactComponent` => the `react` component instance
 * args `Array<any>` => the array of arguments passed to the method directly
 * extraArgs `Array<any>` => an array of any additional arguments passed to `createMethod` on instantiation
 
 If you return something from this method, it shall be respected.
+
+**NOTE**: The example above creates a functional `render` method, however most prefer to leave it in the class because it creates a clear separation of business logic and rendering logic (as in the [Usage](#usage) example). The choice is up to you!
 
 #### createComponentRef
 

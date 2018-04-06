@@ -53,6 +53,25 @@ const onClickIncrementCounter = (instance, [event]) => {
   }));
 };
 
+const render = (instance) => (
+  <div>
+    <h1 ref={createElementRef(instance, 'header')}>App</h1>
+
+    <StyledButton
+      onClick={instance.onClickIncrementCounter}
+      ref={createComponentRef(instance, 'button')}
+    >
+      Click to increment the counter
+    </StyledButton>
+
+    <br />
+    <br />
+    <br />
+
+    <Span ref={createCombinedRef(instance, 'span')}>{instance.state.counter}</Span>
+  </div>
+);
+
 class App extends Component {
   state = {
     counter: 0
@@ -69,26 +88,7 @@ class App extends Component {
 
   onClickIncrementCounter = createMethod(this, onClickIncrementCounter);
 
-  render() {
-    return (
-      <div>
-        <h1 ref={createElementRef(this, 'header')}>App</h1>
-
-        <StyledButton
-          onClick={this.onClickIncrementCounter}
-          ref={createComponentRef(this, 'button')}
-        >
-          Click to increment the counter
-        </StyledButton>
-
-        <br />
-        <br />
-        <br />
-
-        <Span ref={createCombinedRef(this, 'span')}>{this.state.counter}</Span>
-      </div>
-    );
-  }
+  render = createMethod(this, render);
 }
 
 createMethod(() => {});

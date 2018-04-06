@@ -57,10 +57,7 @@ export const createRefCreator = (getter) => (instance, ref) =>
  * @param {ReactComponent} component the component to assin
  * @returns {{component: ReactComponent, element: HTMLElement}} the namespaced ref
  */
-export const getNamespacedRef = (component) => ({
-  component,
-  element: findDOMNode(component)
-});
+export const getNamespacedRef = (component) => ({component, element: findDOMNode(component)});
 
 /**
  * @function identity
