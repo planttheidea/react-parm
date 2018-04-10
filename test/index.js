@@ -72,6 +72,9 @@ test('if createComponent will create a standard component class with static stat
   const div = document.createElement('div');
 
   ReactDOM.render(<GeneratedParm foo="foo" />, div);
+
+  t.true(componentDidMount.calledOnce);
+  t.is(GeneratedParm.prototype.constructor, React.Component.prototype.constructor);
 });
 
 test('if createComponent will create a pure component class with derived state', (t) => {
@@ -106,7 +109,7 @@ test('if createComponent will create a pure component class with derived state',
   ReactDOM.render(<GeneratedParm foo="buzz" />, div);
 
   t.true(componentDidMount.calledOnce);
-  t.is(componentDidMount.args[0][0].constructor, GeneratedParm);
+  t.is(GeneratedParm.prototype.constructor, React.PureComponent.prototype.constructor);
 });
 
 test('if createComponent will create a component class when no options are passed', (t) => {
