@@ -1,4 +1,5 @@
 // external dependencies
+import React from 'react';
 import {findDOMNode} from 'react-dom';
 
 // utils
@@ -64,3 +65,37 @@ export const createMethod = (instance, method, ...extraArgs) =>
   isClassComponent(instance)
     ? bindSetState(instance) && ((...args) => method.call(instance, instance, args, extraArgs))
     : logInvalidInstanceError('method'); // eslint-disable-line no-console
+
+/**
+ * @function createComponent
+ *
+ * @description
+ * create a component from the render method and any options passed
+ *
+ * @param {function} render the function to render the component
+ * @param {Object} [options={}] the options to render the component with
+ * @param {function} [getInitialState] the method to get the initial state with
+ * @param {boolean} [isPure] is PureComponent used
+ * @param {Object} [state] the initial state
+ * @returns {ReactComponent} the component class
+ */
+export const createComponent = (render, {getInitialState, isPure, state, ...options} = {}) =>
+  class ParmComponent extends (isPure ? React.PureComponent : React.Component) {
+    static displayName = render.displayName || render.name || 'ParmComponent';
+    static propTypes = render.propTypes;
+    static contextTypes = render.contextTypes;
+    static childContextTypes = render.childContextTypes;
+    static defaultProps = render.defaultProps;
+
+    constructor(props) {
+      super(props);
+
+      this.state = typeof getInitialState === 'function' ? createMethod(this, getInitialState)() : state || null;
+
+      Object.keys(options).forEach((key) => {
+        this[key] = typeof options[key] === 'function' ? createMethod(this, options[key]) : options[key];
+      });
+    }
+
+    render = createMethod(this, render);
+  };
