@@ -8,6 +8,7 @@ Handle react classes with more functional purity
 * [Usage](#usage)
 * [Methods](#methods)
   * [createMethod](#createmethod)
+  * [createComponent](#createcomponent)
   * [createComponentRef](#createcomponentref)
   * [createElementRef](#createelementref)
   * [createCombinedRef](#createcombinedref)
@@ -15,7 +16,7 @@ Handle react classes with more functional purity
 
 ## Summary
 
-`react-parm` is a thin abstraction (690 bytes minified and gzipped) providing partial-application methods that allow you to handle `react` classes with much more functional purity. This allows for better encapsulation, greater separation of concerns, and simplified testing. When combined with destructuring, it also improves readability and comprehension.
+`react-parm` is a thin abstraction providing partial-application methods that allow you to handle `react` classes with much more functional purity. This allows for better encapsulation, greater separation of concerns, and simplified testing. When combined with destructuring, it also improves readability and comprehension.
 
 ## Usage
 
@@ -90,15 +91,53 @@ export default class App extends Component {
 }
 ```
 
-There are three parameters passed to the `method` you provide:
+#### createComponent
 
-* instance `ReactComponent` => the `react` component instance
-* args `Array<any>` => the array of arguments passed to the method directly
-* extraArgs `Array<any>` => an array of any additional arguments passed to `createMethod` on instantiation
+Create a component with all available instance-based methods, values, and refs a `Component` class has with functional purity.
 
-If you return something from this method, it shall be respected.
+_createComponent(render: function, options: Object): ReactComponent_
 
-**NOTE**: The example above creates a functional `render` method, however most prefer to leave it in the class because it creates a clear separation of business logic and rendering logic (as in the [Usage](#usage) example). The choice is up to you!
+```javascript
+import React from "react";
+import { createComponent } from "react-parm";
+
+export const state = {
+  isMounted: false
+};
+
+export const componentDidMount = ({ setState }) =>
+  setState(() => ({ isMounted: true }));
+
+export const onClickDoThing = ({ props }, [event], [withStuff]) =>
+  props.doThing(event.currentTarget, withStuff);
+
+export const DoTheThing = ({ onClickDoThing }) => (
+  <div>
+    <h3>All methods are supported!</h3>
+
+    <button onClick={onClickDoThing}>Do the thing</button>
+  </div>
+);
+
+DoTheThing.displayName = "DoTheThing";
+
+DoTheThing.propTypes = {
+  doThing: PropTypes.func.isRequired
+};
+
+export default createComponent(DoTheThing, {
+  componentDidMount,
+  onClickDoThing,
+  state
+});
+```
+
+All methods passed in `options` will be parmed with `createMethod`, and all other values will be assigned to the instance.
+
+There are two additional properties that are treated outside the context of assignment to the instance:
+
+* `isPure` => should `PureComponent` be used to construct the underlying component class instead of `Component` (defaults to `false`)
+* `getInitialState` => if a method is passed, then it is parmed and used to derive the initial state instead of the static `state` property
 
 #### createComponentRef
 

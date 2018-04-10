@@ -3,7 +3,7 @@ import React, {Component, PureComponent} from 'react';
 import {hot} from 'react-hot-loader';
 import styled from 'styled-components';
 
-import {createCombinedRef, createComponentRef, createElementRef, createMethod} from '../src';
+import {createCombinedRef, createComponent, createComponentRef, createElementRef, createMethod} from '../src';
 
 class Button extends PureComponent {
   static displayName = 'Button';
@@ -53,24 +53,20 @@ const onClickIncrementCounter = (instance, [event]) => {
   }));
 };
 
-const render = (instance) => (
-  <div>
-    <h1 ref={createElementRef(instance, 'header')}>App</h1>
+const Generated = ({props}) => <div>Props: {JSON.stringify(props)}</div>;
 
-    <StyledButton
-      onClick={instance.onClickIncrementCounter}
-      ref={createComponentRef(instance, 'button')}
-    >
-      Click to increment the counter
-    </StyledButton>
+Generated.defaultProps = {
+  foo: 'bar'
+};
 
-    <br />
-    <br />
-    <br />
-
-    <Span ref={createCombinedRef(instance, 'span')}>{instance.state.counter}</Span>
-  </div>
-);
+const GeneratedParm = createComponent(Generated, {
+  componentDidMount,
+  getInitialState({props}) {
+    return {
+      baz: props.foo
+    };
+  }
+});
 
 class App extends Component {
   state = {
@@ -88,7 +84,29 @@ class App extends Component {
 
   onClickIncrementCounter = createMethod(this, onClickIncrementCounter);
 
-  render = createMethod(this, render);
+  render() {
+    return (
+      <div>
+        <h1 ref={createElementRef(this, 'header')}>App</h1>
+
+        <StyledButton
+          onClick={this.onClickIncrementCounter}
+          ref={createComponentRef(this, 'button')}
+        >
+          Click to increment the counter
+        </StyledButton>
+
+        <br />
+
+        <GeneratedParm bar="baz" />
+        <br />
+
+        <br />
+
+        <Span ref={createCombinedRef(this, 'span')}>{this.state.counter}</Span>
+      </div>
+    );
+  }
 }
 
 createMethod(() => {});
