@@ -79,23 +79,30 @@ export const createMethod = (instance, method, ...extraArgs) =>
  * @param {Object} [state] the initial state
  * @returns {ReactComponent} the component class
  */
-export const createComponent = (render, {getInitialState, isPure, state, ...options} = {}) =>
-  class ParmComponent extends (isPure ? React.PureComponent : React.Component) {
-    static displayName = render.displayName || render.name || 'ParmComponent';
-    static propTypes = render.propTypes;
-    static contextTypes = render.contextTypes;
-    static childContextTypes = render.childContextTypes;
-    static defaultProps = render.defaultProps;
+export const createComponent = (render, {getInitialState, isPure, state, ...options} = {}) => {
+  const Constructor = isPure ? React.PureComponent : React.Component;
 
-    constructor(props) {
-      super(props);
+  function ParmComponent(initialProps) {
+    Constructor.call(this, initialProps);
 
-      this.state = typeof getInitialState === 'function' ? createMethod(this, getInitialState)() : state || null;
+    this.state = typeof getInitialState === 'function' ? createMethod(this, getInitialState)() : state || null;
 
-      Object.keys(options).forEach((key) => {
-        this[key] = typeof options[key] === 'function' ? createMethod(this, options[key]) : options[key];
-      });
-    }
+    Object.keys(options).forEach((key) => {
+      this[key] = typeof options[key] === 'function' ? createMethod(this, options[key]) : options[key];
+    });
 
-    render = createMethod(this, render);
-  };
+    this.render = createMethod(this, render);
+
+    return this;
+  }
+
+  ParmComponent.prototype = Object.create(Constructor.prototype);
+
+  ParmComponent.displayName = render.displayName || render.name || 'ParmComponent';
+  ParmComponent.propTypes = render.propTypes;
+  ParmComponent.contextTypes = render.contextTypes;
+  ParmComponent.childContextTypes = render.childContextTypes;
+  ParmComponent.defaultProps = render.defaultProps;
+
+  return ParmComponent;
+};

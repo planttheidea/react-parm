@@ -65,7 +65,8 @@ const GeneratedParm = createComponent(Generated, {
     return {
       baz: props.foo
     };
-  }
+  },
+  isPure: true
 });
 
 class App extends Component {
