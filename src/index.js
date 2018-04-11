@@ -73,7 +73,7 @@ export const createMethod = (instance, method, ...extraArgs) =>
  *
  * @param {ReactComponent} instance the instance the method is assigned to
  * @param {function} render the render method
- * @returns {function(...Array<any>): any} the method with the instance passed as value
+ * @returns {function(): ReactElement} the method with the props and instance passed as values
  */
 export const createRender = (instance, render) =>
   isClassComponent(instance)
