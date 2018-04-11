@@ -3,6 +3,11 @@ import React from 'react';
 import {findDOMNode} from 'react-dom';
 
 /**
+ * @constant {Array<string>} IGNORED_COMPONENT_KEYS keys to ignore when creating a component
+ */
+export const IGNORED_COMPONENT_KEYS = ['getInitialState', 'isPure', 'state'];
+
+/**
  * @function bindSetState
  *
  * @description

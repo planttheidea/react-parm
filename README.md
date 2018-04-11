@@ -8,10 +8,12 @@ Handle react classes with more functional purity
 * [Usage](#usage)
 * [Methods](#methods)
   * [createMethod](#createmethod)
+  * [createRender](#createrender)
   * [createComponent](#createcomponent)
   * [createComponentRef](#createcomponentref)
   * [createElementRef](#createelementref)
   * [createCombinedRef](#createcombinedref)
+* [Why parm?](#why-parm)
 * [Development](#development)
 
 ## Summary
@@ -58,9 +60,9 @@ export default class App extends React.Component {
 
 #### createMethod
 
-Create a bound instance or lifecycle method, which will receive the full instance as the first parameter.
+Create a functional instance or lifecycle method, which will receive the full instance as the first parameter.
 
-_createMethod(instance: ReactComponent, method: function, ...extraArgs: Array<any>): (instance: Object, args: Array<any>, extraArgs: Array<any>) => any_
+_createMethod(instance: ReactComponent, method: function, ...extraArgs: Array<any>): (instance: ReactComponent, args: Array<any>, extraArgs: Array<any>) => any_
 
 ```javascript
 import React from "react";
@@ -72,13 +74,50 @@ export const componentDidMount = ({ setState }) =>
 export const onClickDoThing = ({ props }, [event], [withStuff]) =>
   props.doThing(event.currentTarget, withStuff);
 
-export const render = ({ onClickDoThing }) => (
-  <div>
-    <h3>All methods are supported!</h3>
+export default class App extends Component {
+  state = {
+    isMounted: false
+  };
 
-    <button onClick={onClickDoThing}>Do the thing</button>
-  </div>
-);
+  componentDidMount = createMethod(this, componentDidMount);
+  onClickDoThing = createMethod(this, onClickDoThing, true);
+
+  render() {
+    return (
+      <div>
+        <h3>Welcome to doing the thing</h3>
+
+        <button onClick={this.onClickDoThing}>Do the thing</button>
+      </div>
+    );
+  }
+}
+```
+
+#### createRender
+
+Create a functional render method, which will receive the `props` as the first parameter, and the full instance as the second parameter.
+
+_createRender(instance: ReactComponent, render: function): (props: Object, instance: ReactComponent) => ReactElement_
+
+```javascript
+import React from "react";
+import { createMethod, createRender } from "react-parm";
+
+export const componentDidMount = ({ setState }) =>
+  setState(() => ({ isMounted: true }));
+
+export const DoTheThing = ({ doThing }. { state: { isMounted } }) => {
+  return (
+    <div>
+      <h3>Welcome to doing the mounted thing</h3>
+
+      <span>Am I mounted? {isMounted ? 'YES!' : 'No :('}</span>
+
+      <button onClick={doThing}>Do the thing</button>
+    </div>
+  );
+};
 
 export default class App extends Component {
   state = {
@@ -87,13 +126,16 @@ export default class App extends Component {
 
   componentDidMount = createMethod(this, componentDidMount);
   onClickDoThing = createMethod(this, onClickDoThing, true);
-  render = createMethod(this, render);
+
+  render = createRender(this, DoTheThing);
 }
 ```
 
+**NOTE**: The difference in signature from `createMethod` is both for common-use purposes, but also because it allows linting tools to appropriately lint for `PropTypes`.
+
 #### createComponent
 
-Create a component with all available instance-based methods, values, and refs a `Component` class has with functional purity.
+Create a functional component with all available instance-based methods, values, and refs a `Component` class has.
 
 _createComponent(render: function, options: Object): ReactComponent_
 
@@ -111,11 +153,11 @@ export const componentDidMount = ({ setState }) =>
 export const onClickDoThing = ({ props }, [event], [withStuff]) =>
   props.doThing(event.currentTarget, withStuff);
 
-export const DoTheThing = ({ onClickDoThing }) => (
+export const DoTheThing = ({ doThing }, { onClickDoThing }) => (
   <div>
-    <h3>All methods are supported!</h3>
+    <h3>Welcome to doing the thing</h3>
 
-    <button onClick={onClickDoThing}>Do the thing</button>
+    <button onClick={doThing && onClickDoThing}>Do the thing</button>
   </div>
 );
 
@@ -132,9 +174,7 @@ export default createComponent(DoTheThing, {
 });
 ```
 
-All methods passed in `options` will be parmed with `createMethod`, and all other values will be assigned to the instance.
-
-There are two additional properties that are treated outside the context of assignment to the instance:
+The component will be parmed with `createRender`, all methods passed in `options` will be parmed with `createMethod`, and all other values will be assigned to the instance. There are also two additional properties that are treated outside the context of assignment to the instance:
 
 * `isPure` => should `PureComponent` be used to construct the underlying component class instead of `Component` (defaults to `false`)
 * `getInitialState` => if a method is passed, then it is parmed and used to derive the initial state instead of the static `state` property
@@ -213,6 +253,10 @@ export default class App extends Component {
 ```
 
 The value assigned will be an object with `component` and `element` properties, which reflect the component and the DOM node for that component respectively. The `ref` string value passed will be the key that will be used in the assignment to the `instance`.
+
+## Why parm?
+
+PARM is an acronym, standing for Partial-Application React Method. Also, why not parm? It's delicious.
 
 ## Development
 
