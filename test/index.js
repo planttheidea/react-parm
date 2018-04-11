@@ -44,7 +44,7 @@ test('if createComponent will create a standard component class with static stat
     foo: 'quz'
   };
 
-  const Generated = ({state}) => <div>{state.foo}</div>;
+  const Generated = (props, {state}) => <div>{state.foo}</div>;
 
   Generated.displayName = 'DisplayName';
 
@@ -86,9 +86,10 @@ test('if createComponent will create a pure component class with derived state',
 
   componentDidMount.resetHistory();
 
-  const Generated = ({state}) => <div>{state.foo}</div>;
+  const Generated = function Generated(props, {state}) {
+    return <div>{state.foo}</div>;
+  };
 
-  Generated.displayName = 'PureDisplayName';
   Generated.propTypes = {};
   Generated.defaultProps = {};
 
@@ -100,7 +101,7 @@ test('if createComponent will create a pure component class with derived state',
     isPure: true
   });
 
-  t.is(GeneratedParm.displayName, Generated.displayName);
+  t.is(GeneratedParm.displayName, Generated.name);
   t.is(GeneratedParm.propTypes, Generated.propTypes);
   t.is(GeneratedParm.defaultProps, Generated.defaultProps);
 
@@ -113,10 +114,18 @@ test('if createComponent will create a pure component class with derived state',
 });
 
 test('if createComponent will create a component class when no options are passed', (t) => {
-  const Generated = ({props}) => <div>{props.foo}</div>;
+  const Generated = ({foo}) => <div>{foo}</div>;
+
+  delete Generated.name;
+
+  Generated.propTypes = {
+    foo: PropTypes.string
+  };
 
   try {
-    index.createComponent(Generated);
+    const GeneratedParm = index.createComponent(Generated);
+
+    t.is(GeneratedParm.displayName, 'ParmComponent');
 
     t.pass();
   } catch (error) {
@@ -218,6 +227,34 @@ test('if createMethod will log the error when not a valid instance', (t) => {
 
   t.true(stub.calledOnce);
   t.true(stub.calledWith('method'));
+
+  stub.restore();
+});
+
+test('if createRender will create a render method that receives props and the instance', (t) => {
+  const render = (props, instance) => {
+    t.is(props, instance.props);
+    t.is(props.bar, 'baz');
+
+    return null;
+  };
+
+  class Foo extends React.Component {
+    render = index.createRender(this, render);
+  }
+
+  const div = document.createElement('div');
+
+  ReactDOM.render(<Foo bar="baz" />, div);
+});
+
+test('if createRender will log the error when not a valid instance', (t) => {
+  const stub = sinon.stub(utils, 'logInvalidInstanceError');
+
+  index.createRender(() => {}, () => {});
+
+  t.true(stub.calledOnce);
+  t.true(stub.calledWith('render'));
 
   stub.restore();
 });

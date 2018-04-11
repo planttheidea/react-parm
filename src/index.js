@@ -4,6 +4,7 @@ import {findDOMNode} from 'react-dom';
 
 // utils
 import {
+  IGNORED_COMPONENT_KEYS,
   bindSetState,
   createRefCreator,
   getNamespacedRef,
@@ -54,8 +55,6 @@ export const createElementRef = createRefCreator(findDOMNode);
  * @description
  * create a method that is a pure version of the lifecycle / instance method passed to it
  *
- * the conditional function return is to ensure the method is called with as performant a way as possible
- *
  * @param {ReactComponent} instance the instance the method is assigned to
  * @param {function} method the instance method
  * @param {Array<any>} extraArgs additional args to pass to the method
@@ -65,6 +64,21 @@ export const createMethod = (instance, method, ...extraArgs) =>
   isClassComponent(instance)
     ? bindSetState(instance) && ((...args) => method.call(instance, instance, args, extraArgs))
     : logInvalidInstanceError('method'); // eslint-disable-line no-console
+
+/**
+ * @function createRender
+ *
+ * @description
+ * create a method that is a pure version of the render method
+ *
+ * @param {ReactComponent} instance the instance the method is assigned to
+ * @param {function} render the render method
+ * @returns {function(): ReactElement} the method with the props and instance passed as values
+ */
+export const createRender = (instance, render) =>
+  isClassComponent(instance)
+    ? () => render.call(instance, instance.props, instance)
+    : logInvalidInstanceError('render'); // eslint-disable-line no-console
 
 /**
  * @function createComponent
@@ -79,7 +93,8 @@ export const createMethod = (instance, method, ...extraArgs) =>
  * @param {Object} [state] the initial state
  * @returns {ReactComponent} the component class
  */
-export const createComponent = (render, {getInitialState, isPure, state, ...options} = {}) => {
+export const createComponent = (render, options = {}) => {
+  const {getInitialState, isPure, state} = options;
   const Constructor = isPure ? React.PureComponent : React.Component;
 
   function ParmComponent(initialProps) {
@@ -88,10 +103,14 @@ export const createComponent = (render, {getInitialState, isPure, state, ...opti
     this.state = typeof getInitialState === 'function' ? createMethod(this, getInitialState)() : state || null;
 
     Object.keys(options).forEach((key) => {
+      if (~IGNORED_COMPONENT_KEYS.indexOf(key)) {
+        return;
+      }
+
       this[key] = typeof options[key] === 'function' ? createMethod(this, options[key]) : options[key];
     });
 
-    this.render = createMethod(this, render);
+    this.render = createRender(this, render);
 
     return this;
   }

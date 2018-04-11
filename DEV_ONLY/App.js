@@ -3,7 +3,14 @@ import React, {Component, PureComponent} from 'react';
 import {hot} from 'react-hot-loader';
 import styled from 'styled-components';
 
-import {createCombinedRef, createComponent, createComponentRef, createElementRef, createMethod} from '../src';
+import {
+  createCombinedRef,
+  createComponent,
+  createComponentRef,
+  createElementRef,
+  createMethod,
+  createRender
+} from '../src';
 
 class Button extends PureComponent {
   static displayName = 'Button';
@@ -22,17 +29,19 @@ const StyledButton = styled(Button)`
   display: block;
 `;
 
+const SpanFunctional = ({children, ...props}) => <span {...props}>{children}</span>;
+
+SpanFunctional.propTypes = {
+  children: PropTypes.node.isRequired
+};
+
 class Span extends PureComponent {
   static displayName = 'Span';
   static propTypes = {
     children: PropTypes.node
   };
 
-  render() {
-    const {children, ...props} = this.props;
-
-    return <span {...props}>{children}</span>;
-  }
+  render = createRender(this, SpanFunctional);
 }
 
 const componentDidMount = (instance) => console.log(instance);
@@ -53,7 +62,11 @@ const onClickIncrementCounter = (instance, [event]) => {
   }));
 };
 
-const Generated = ({props}) => <div>Props: {JSON.stringify(props)}</div>;
+const Generated = (props, instance) => {
+  console.log('render instance', instance);
+
+  return <Span>Props: {JSON.stringify(props)}</Span>;
+};
 
 Generated.defaultProps = {
   foo: 'bar'
@@ -111,5 +124,6 @@ class App extends Component {
 }
 
 createMethod(() => {});
+createRender(() => {});
 
 export default hot(module)(App);
