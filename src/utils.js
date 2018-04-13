@@ -16,7 +16,10 @@ export const IGNORED_COMPONENT_KEYS = ['getInitialState', 'isPure', 'state'];
  * @param {ReactComponent} instance the instance to bind setState to
  * @returns {void}
  */
-export const bindSetState = (instance) => (instance.setState = instance.setState.bind(instance));
+export const bindSetState = (instance) =>
+  Object.prototype.hasOwnProperty.call(instance.setState, 'prototype')
+    ? (instance.setState = instance.setState.bind(instance))
+    : instance.setState;
 
 /**
  * @function isClassComponent
