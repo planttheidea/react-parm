@@ -1,5 +1,10 @@
 # react-parm CHANGELOG
 
+## 2.0.1
+
+* Prevent unnecessary re-binding of `setState` on instance
+* Ensure `setState` is bound when using `createRender` (and by extension, `createComponent`)
+
 ## 2.0.0
 
 #### BREAKING CHANGES

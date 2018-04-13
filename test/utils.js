@@ -19,6 +19,32 @@ test('if bindSetState will bind the setState method to the instance', (t) => {
   t.false(Object.prototype.hasOwnProperty.call(instance.setState, 'prototype'));
 });
 
+test('if bindSetState will not bind the setState method if it is already bound', (t) => {
+  const setState = function() {};
+
+  const instance = {
+    setState
+  };
+
+  setState.bind = sinon.stub().callsFake(function() {
+    return Function.prototype.bind.apply(instance.setState, arguments);
+  });
+
+  utils.bindSetState(instance);
+
+  t.true(setState.bind.calledOnce);
+
+  t.not(instance.setState, setState);
+
+  const currentSetState = instance.setState;
+
+  currentSetState.bind = sinon.spy();
+
+  t.true(currentSetState.bind.notCalled);
+
+  t.is(instance.setState, currentSetState);
+});
+
 test('if isClassComponent will return false when the value is falsy', (t) => {
   const value = null;
 

@@ -63,7 +63,7 @@ export const createElementRef = createRefCreator(findDOMNode);
 export const createMethod = (instance, method, ...extraArgs) =>
   isClassComponent(instance)
     ? bindSetState(instance) && ((...args) => method.call(instance, instance, args, extraArgs))
-    : logInvalidInstanceError('method'); // eslint-disable-line no-console
+    : logInvalidInstanceError('method');
 
 /**
  * @function createRender
@@ -77,8 +77,8 @@ export const createMethod = (instance, method, ...extraArgs) =>
  */
 export const createRender = (instance, render) =>
   isClassComponent(instance)
-    ? () => render.call(instance, instance.props, instance)
-    : logInvalidInstanceError('render'); // eslint-disable-line no-console
+    ? bindSetState(instance) && (() => render.call(instance, instance.props, instance))
+    : logInvalidInstanceError('render');
 
 /**
  * @function createComponent
@@ -100,16 +100,13 @@ export const createComponent = (render, options = {}) => {
   function ParmComponent(initialProps) {
     Constructor.call(this, initialProps);
 
-    this.state = typeof getInitialState === 'function' ? createMethod(this, getInitialState)() : state || null;
-
     Object.keys(options).forEach((key) => {
-      if (~IGNORED_COMPONENT_KEYS.indexOf(key)) {
-        return;
+      if (!~IGNORED_COMPONENT_KEYS.indexOf(key)) {
+        this[key] = typeof options[key] === 'function' ? createMethod(this, options[key]) : options[key];
       }
-
-      this[key] = typeof options[key] === 'function' ? createMethod(this, options[key]) : options[key];
     });
 
+    this.state = typeof getInitialState === 'function' ? createMethod(this, getInitialState)() : state || null;
     this.render = createRender(this, render);
 
     return this;
