@@ -5,6 +5,7 @@ import {findDOMNode} from 'react-dom';
 // utils
 import {
   IGNORED_COMPONENT_KEYS,
+  addPropTypeIsRequired,
   bindSetState,
   createRefCreator,
   getNamespacedRef,
@@ -122,3 +123,24 @@ export const createComponent = (render, options = {}) => {
 
   return ParmComponent;
 };
+
+/**
+ * @function createPropType
+ *
+ * @description
+ * create a custom prop type handler
+ *
+ * @param {function(Object): (Error|null)} handler the prop type handler
+ * @returns {function} the custom prop type
+ */
+export const createPropType = (handler) =>
+  addPropTypeIsRequired((props, key, component, locationIgnored, fullKey) =>
+    handler({
+      component,
+      key,
+      name: fullKey ? fullKey.split(/(\.|\[)/)[0] : key,
+      path: fullKey || key,
+      props,
+      value: props[key]
+    })
+  );

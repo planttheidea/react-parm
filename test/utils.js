@@ -7,6 +7,36 @@ import sinon from 'sinon';
 // src
 import * as utils from 'src/utils';
 
+test('if addPropTypeIsRequired will add an isRequired method to the propType that will call propType when existy', (t) => {
+  const propType = sinon.spy();
+
+  const result = utils.addPropTypeIsRequired(propType);
+
+  t.is(typeof result.isRequired, 'function');
+
+  const args = [{key: 'value'}, 'key', 'component'];
+
+  result.isRequired(...args);
+
+  t.true(propType.calledOnce);
+  t.true(propType.calledWith(...args));
+});
+
+test('if addPropTypeIsRequired will add an isRequired method to the propType that will return an error when not existy', (t) => {
+  const propType = sinon.spy();
+
+  const result = utils.addPropTypeIsRequired(propType);
+
+  t.is(typeof result.isRequired, 'function');
+
+  const args = ['props', 'key', 'component'];
+
+  const error = result.isRequired(...args);
+
+  t.true(propType.notCalled);
+  t.true(error instanceof Error);
+});
+
 test('if bindSetState will bind the setState method to the instance', (t) => {
   const instance = {
     setState() {}

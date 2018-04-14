@@ -9,7 +9,14 @@ document.body.style.margin = 0;
 document.body.style.padding = 0;
 
 const renderApp = (container) => {
-  render(<App />, container);
+  // render(<App custom={null} />, container);
+  render(<App
+    custom="bar"
+    customArrayOf={['bar']}
+    customObjectOf={{foo: 'bar'}}
+         />, container);
+  // render(<App custom="bar" />, container);
+  // render(<App custom="foo" />, container);
 };
 
 const div = document.createElement('div');

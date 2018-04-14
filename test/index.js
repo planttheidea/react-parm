@@ -258,3 +258,53 @@ test('if createRender will log the error when not a valid instance', (t) => {
 
   stub.restore();
 });
+
+test('if createPropType will create a custom prop type validator for a standard prop', (t) => {
+  const handler = sinon.spy();
+
+  const result = index.createPropType(handler);
+
+  t.is(typeof result, 'function');
+  t.is(typeof result.isRequired, 'function');
+
+  const args = [{key: 'value'}, 'key', 'Component'];
+
+  result(...args);
+
+  t.true(handler.calledOnce);
+  t.true(
+    handler.calledWith({
+      component: args[2],
+      key: args[1],
+      name: args[1],
+      path: args[1],
+      props: args[0],
+      value: args[0][args[1]]
+    })
+  );
+});
+
+test('if createPropType will create a custom prop type validator for a nested prop', (t) => {
+  const handler = sinon.spy();
+
+  const result = index.createPropType(handler);
+
+  t.is(typeof result, 'function');
+  t.is(typeof result.isRequired, 'function');
+
+  const args = [{key: 'value'}, 'key', 'Component', 'location', 'higher.key'];
+
+  result(...args);
+
+  t.true(handler.calledOnce);
+  t.true(
+    handler.calledWith({
+      component: args[2],
+      key: args[1],
+      name: args[4].split('.')[0],
+      path: args[4],
+      props: args[0],
+      value: args[0][args[1]]
+    })
+  );
+});
