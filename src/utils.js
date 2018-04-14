@@ -8,6 +8,21 @@ import {findDOMNode} from 'react-dom';
 export const IGNORED_COMPONENT_KEYS = ['getInitialState', 'isPure', 'state'];
 
 /**
+ * @function addPropTypeIsRequired
+ *
+ * @description
+ * add the isRequired method to the propType
+ *
+ * @param {function} propType the propType checker
+ * @returns {function} the propType with the isRequired function added
+ */
+export const addPropTypeIsRequired = (propType) =>
+  (propType.isRequired = (props, key, component) =>
+    props[key] == null // eslint-disable-line eqeqeq
+      ? new Error(`The prop \`${key}\` is marked as required in \`${component}\`, but its value is \`${props[key]}\`.`)
+      : propType(props, key, component)) && propType;
+
+/**
  * @function bindSetState
  *
  * @description

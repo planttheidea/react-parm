@@ -9,6 +9,7 @@ import {
   createComponentRef,
   createElementRef,
   createMethod,
+  createPropType,
   createRender
 } from '../src';
 
@@ -82,7 +83,16 @@ const GeneratedParm = createComponent(Generated, {
   isPure: true
 });
 
+const isFoo = createPropType(
+  ({component, key, value}) =>
+    value === 'foo' ? null : new Error(`The key ${key} is "${value}" in ${component}, when it should be "foo"!`)
+);
+
 class App extends Component {
+  static propTypes = {
+    custom: isFoo.isRequired
+  };
+
   state = {
     counter: 0
   };
