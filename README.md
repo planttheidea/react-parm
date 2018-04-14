@@ -13,6 +13,7 @@ Handle react classes with more functional purity
   * [createComponentRef](#createcomponentref)
   * [createElementRef](#createelementref)
   * [createCombinedRef](#createcombinedref)
+  * [createPropType](#createproptype)
 * [Why parm?](#why-parm)
 * [Development](#development)
 
@@ -253,6 +254,64 @@ export default class App extends Component {
 ```
 
 The value assigned will be an object with `component` and `element` properties, which reflect the component and the DOM node for that component respectively. The `ref` string value passed will be the key that will be used in the assignment to the `instance`.
+
+#### createPropType
+
+Create a custom PropTypes validation method.
+
+_createPropType(validator: function): (metadata: Object) => (Error|null)_
+
+```javascript
+import { createPropType } from "react-parm";
+
+export const isFoo = createPropType(({ component, name, value }) =>
+  value === "foo"
+    ? null
+    : new Error(
+        `The prop "${name}" is "${value}" in ${component}, when it should be "foo"!`
+      );
+);
+```
+
+The full shape of the `metadata` object passed to `createPropType`:
+
+```javascript
+{
+  component: string, // the name of the component
+  key: string, // the key that is being validated
+  name: string, // the name of the prop being validated
+  path: string, // the full path (if nested) of the key being validated
+  props: any, // the props object
+  value: any // the value of the prop passed
+}
+```
+
+Please note that usage may result in different values for these keys, based on whether the custom prop type is used in `arrayOf` / `objectOf` or not.
+
+When used in `arrayOf` or `objectOf`:
+
+* `key` represents the nested key being validated
+* `name` represents the name of the prop that was passed
+* `path` represents the full path being validated
+
+Example:
+
+```javascript
+const isArrayOfFoo = createPropType(
+  ({ component, key, name, path, value }) => {
+    value === "foo"
+      ? null
+      : new Error(
+          `The key "${key}" for prop "${name}" at path ${path} is "${value}" in ${component}, when it should be "foo"!`
+        );
+  }
+);
+...
+<SomeComponent bar={['baz']}>
+// The key "0" for prop "bar" at path "bar[0]" is "baz" in "SomeComponent", when it should be "foo"!
+```
+
+When the prop type is used in any context other than `arrayOf` / `objectOf`, then `key`, `name`, and `path` will all be the same value.
 
 ## Why parm?
 

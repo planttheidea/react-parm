@@ -83,14 +83,31 @@ const GeneratedParm = createComponent(Generated, {
   isPure: true
 });
 
-const isFoo = createPropType(
-  ({component, key, value}) =>
-    value === 'foo' ? null : new Error(`The key ${key} is "${value}" in ${component}, when it should be "foo"!`)
-);
+const isFoo = createPropType((checker) => {
+  const {component, name, value} = checker;
+
+  console.log('standard prop type', checker);
+
+  return value === 'foo'
+    ? null
+    : new Error(`The prop "${name}" is "${value}" in ${component}, when it should be "foo"!`);
+});
+
+const isMultipleOfFoo = createPropType((checker) => {
+  const {component, key, name, value} = checker;
+
+  console.log('of prop type', checker);
+
+  return value === 'foo'
+    ? null
+    : new Error(`The key "${key}" for prop "${name}" is "${value}" in ${component}, when it should be "foo"!`);
+});
 
 class App extends Component {
   static propTypes = {
-    custom: isFoo.isRequired
+    custom: isFoo.isRequired,
+    customArrayOf: PropTypes.arrayOf(isMultipleOfFoo).isRequired,
+    customObjectOf: PropTypes.objectOf(isMultipleOfFoo).isRequired
   };
 
   state = {

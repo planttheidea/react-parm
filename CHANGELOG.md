@@ -1,5 +1,10 @@
 # react-parm CHANGELOG
 
+## 2.1.0
+
+* Add [`createPropType`](README.md#createproptype) method
+* Fix references to github in `package.json`
+
 ## 2.0.1
 
 * Prevent unnecessary re-binding of `setState` on instance

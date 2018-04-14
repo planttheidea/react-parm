@@ -123,6 +123,7 @@ export const createComponent = (render, options = {}) => {
 
   return ParmComponent;
 };
+
 /**
  * @function createPropType
  *
@@ -133,10 +134,13 @@ export const createComponent = (render, options = {}) => {
  * @returns {function} the custom prop type
  */
 export const createPropType = (handler) =>
-  addPropTypeIsRequired((props, key, component) =>
+  addPropTypeIsRequired((props, key, component, locationIgnored, fullKey) =>
     handler({
       component,
       key,
+      name: fullKey ? fullKey.split(/(\.|\[)/)[0] : key,
+      path: fullKey || key,
+      props,
       value: props[key]
     })
   );
