@@ -24,7 +24,7 @@
     "Android >= 4"
   ],
   "bugs": {
-    "url": "https://github.com/planttheidea/unchanged/issues"
+    "url": "https://github.com/planttheidea/react-parm/issues"
   },
   "description": "Handle react classes with more functional purity",
   "devDependencies": {
@@ -65,7 +65,7 @@
     "react"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/planttheidea/unchanged#readme",
+  "homepage": "https://github.com/planttheidea/react-parm#readme",
   "main": "lib/index.js",
   "module": "es/index.js",
   "name": "react-parm",
@@ -75,7 +75,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/planttheidea/unchanged.git"
+    "url": "git+https://github.com/planttheidea/react-parm.git"
   },
   "scripts": {
     "benchmark": "npm run transpile:lib && NODE_ENV=production node ./benchmarks/index.js",
