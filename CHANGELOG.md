@@ -1,5 +1,10 @@
 # react-parm CHANGELOG
 
+## 2.2.0
+
+* Add [`createValue`](README.md#createvalue) method
+* Add `getInitialValues` and `onConstruct` as additional options to `createComponent`
+
 ## 2.1.0
 
 * Add [`createPropType`](README.md#createproptype) method
