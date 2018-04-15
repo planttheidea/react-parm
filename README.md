@@ -132,12 +132,12 @@ import { createMethod, createRender } from "react-parm";
 export const componentDidMount = ({ setState }) =>
   setState(() => ({ isMounted: true }));
 
-export const DoTheThing = ({ doThing }. { state: { isMounted } }) => {
+export const DoTheThing = ({ doThing }, { state: { isMounted } }) => {
   return (
     <div>
       <h3>Welcome to doing the mounted thing</h3>
 
-      <span>Am I mounted? {isMounted ? 'YES!' : 'No :('}</span>
+      <span>Am I mounted? {isMounted ? "YES!" : "No :("}</span>
 
       <button onClick={doThing}>Do the thing</button>
     </div>
