@@ -8,6 +8,7 @@ Handle react classes with more functional purity
 * [Usage](#usage)
 * [Methods](#methods)
   * [createMethod](#createmethod)
+  * [createValue](#createvalue)
   * [createRender](#createrender)
   * [createComponent](#createcomponent)
   * [createComponentRef](#createcomponentref)
@@ -91,6 +92,29 @@ export default class App extends Component {
         <button onClick={this.onClickDoThing}>Do the thing</button>
       </div>
     );
+  }
+}
+```
+
+#### createValue
+
+Create a value to assign to the instance based on a functional method which will receive the full instance as the first parameter.
+
+_createValue(instance: ReactComponent, method: function, ...extraArgs: Array<any>): any_
+
+```javascript
+import React from "react";
+import { createValue } from "react-parm";
+
+export const getLength = ({ props }) => {
+  return props.foo.length;
+};
+
+export default class App extends Component {
+  length = createValue(this, getLength);
+
+  render() {
+    return <div>The length of the foo parameter is {this.length}</div>;
   }
 }
 ```
@@ -179,6 +203,9 @@ The component will be parmed with `createRender`, all methods passed in `options
 
 * `isPure` => should `PureComponent` be used to construct the underlying component class instead of `Component` (defaults to `false`)
 * `getInitialState` => if a method is passed, then it is parmed and used to derive the initial state instead of the static `state` property
+* `getInitialValues` => If a method is passed, then it is parmed and used to derive initial instance values
+  * Expects an object to be returned, where a return of `{foo: 'bar'}` will result in `instance.foo` being `"bar"`
+* `onConstruct` => If a method is passed, then it is called with the instance as parameter at the end of construction
 
 #### createComponentRef
 

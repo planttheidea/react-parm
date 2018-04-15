@@ -82,6 +82,22 @@ export const createRender = (instance, render) =>
     : logInvalidInstanceError('render');
 
 /**
+ * @function createValue
+ *
+ * @description
+ * create a value to assign to the instance based on props or the instance itself
+ *
+ * @param {ReactComponent} instance the instance the method is assigned to
+ * @param {function} getValue the function to get the value with
+ * @param {Array<any>} extraArgs additional args to pass to the method
+ * @returns {function(...Array<any>): any} the method with the instance passed as value
+ */
+export const createValue = (instance, getValue, ...extraArgs) =>
+  isClassComponent(instance)
+    ? bindSetState(instance) && getValue.call(instance, instance, extraArgs)
+    : logInvalidInstanceError('value');
+
+/**
  * @function createComponent
  *
  * @description
@@ -91,24 +107,38 @@ export const createRender = (instance, render) =>
  * @param {Object} [options={}] the options to render the component with
  * @param {function} [getInitialState] the method to get the initial state with
  * @param {boolean} [isPure] is PureComponent used
+ * @param {function} [onConstruct] a method to call when constructing the component
  * @param {Object} [state] the initial state
  * @returns {ReactComponent} the component class
  */
-export const createComponent = (render, options = {}) => {
-  const {getInitialState, isPure, state} = options;
+export const createComponent = (render, options) => {
+  const {getInitialState, getInitialValues, isPure, onConstruct, state} = options || {};
   const Constructor = isPure ? React.PureComponent : React.Component;
 
   function ParmComponent(initialProps) {
     Constructor.call(this, initialProps);
 
-    Object.keys(options).forEach((key) => {
-      if (!~IGNORED_COMPONENT_KEYS.indexOf(key)) {
+    this.state = typeof getInitialState === 'function' ? createValue(this, getInitialState) : state || null;
+
+    for (let key in options) {
+      if (!IGNORED_COMPONENT_KEYS[key]) {
         this[key] = typeof options[key] === 'function' ? createMethod(this, options[key]) : options[key];
       }
-    });
+    }
 
-    this.state = typeof getInitialState === 'function' ? createMethod(this, getInitialState)() : state || null;
+    const values = typeof getInitialValues === 'function' ? createValue(this, getInitialValues) : null;
+
+    if (values && typeof values === 'object') {
+      for (let key in values) {
+        this[key] = values[key];
+      }
+    }
+
     this.render = createRender(this, render);
+
+    if (typeof onConstruct === 'function') {
+      onConstruct(this);
+    }
 
     return this;
   }

@@ -3,9 +3,15 @@ import React from 'react';
 import {findDOMNode} from 'react-dom';
 
 /**
- * @constant {Array<string>} IGNORED_COMPONENT_KEYS keys to ignore when creating a component
+ * @constant {Object} IGNORED_COMPONENT_KEYS keys to ignore when creating a component
  */
-export const IGNORED_COMPONENT_KEYS = ['getInitialState', 'isPure', 'state'];
+export const IGNORED_COMPONENT_KEYS = {
+  getInitialState: true,
+  getInitialValues: true,
+  isPure: true,
+  onConstruct: true,
+  state: true
+};
 
 /**
  * @function addPropTypeIsRequired

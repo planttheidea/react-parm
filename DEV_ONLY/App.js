@@ -10,7 +10,8 @@ import {
   createElementRef,
   createMethod,
   createPropType,
-  createRender
+  createRender,
+  createValue
 } from '../src';
 
 class Button extends PureComponent {
@@ -52,6 +53,14 @@ const shouldComponentUpdate = ({state}) => typeof state.counter === 'number' && 
 const componentDidUpdate = (instance, [previousProps, previousState], [constantValue]) =>
   console.log(previousProps, previousState, constantValue);
 
+const getInitialValues = (instance) => {
+  console.log('initial values', instance);
+
+  return {
+    length: instance.props.foo.length
+  };
+};
+
 const onClickIncrementCounter = (instance, [event]) => {
   console.log(instance);
   console.log(event.currentTarget);
@@ -80,7 +89,11 @@ const GeneratedParm = createComponent(Generated, {
       baz: props.foo
     };
   },
-  isPure: true
+  getInitialValues,
+  isPure: true,
+  onConstruct(instance) {
+    console.log('constructed', instance);
+  }
 });
 
 const isFoo = createPropType((checker) => {
@@ -120,7 +133,11 @@ class App extends Component {
 
   button = null;
   header = null;
-  random = 0;
+  random = createValue(this, (instance) => {
+    console.log('random value', instance, instance.state.counter);
+
+    return instance.state.counter;
+  });
   span = null;
 
   onClickIncrementCounter = createMethod(this, onClickIncrementCounter);
@@ -152,5 +169,6 @@ class App extends Component {
 
 createMethod(() => {});
 createRender(() => {});
+createValue(() => {});
 
 export default hot(module)(App);

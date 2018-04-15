@@ -44,7 +44,11 @@ test('if createComponent will create a standard component class with static stat
     foo: 'quz'
   };
 
-  const Generated = (props, {state}) => <div>{state.foo}</div>;
+  const Generated = function Generated(props, instance) {
+    t.deepEqual(instance.state, state);
+
+    return <div>{instance.state.foo}</div>;
+  };
 
   Generated.displayName = 'DisplayName';
 
@@ -84,22 +88,22 @@ test('if createComponent will create a pure component class with derived state',
     foo: 'quz'
   };
 
-  componentDidMount.resetHistory();
+  const Generated = function Generated(props, instance) {
+    t.deepEqual(instance.state, state);
 
-  const Generated = function Generated(props, {state}) {
-    return <div>{state.foo}</div>;
+    return <div>{instance.state.foo}</div>;
   };
 
   Generated.propTypes = {};
   Generated.defaultProps = {};
 
-  const GeneratedParm = index.createComponent(Generated, {
+  const options = {
     componentDidMount,
-    getInitialState() {
-      return state;
-    },
+    getInitialState: sinon.stub().callsFake(() => state),
     isPure: true
-  });
+  };
+
+  const GeneratedParm = index.createComponent(Generated, options);
 
   t.is(GeneratedParm.displayName, Generated.name);
   t.is(GeneratedParm.propTypes, Generated.propTypes);
@@ -111,6 +115,8 @@ test('if createComponent will create a pure component class with derived state',
 
   t.true(componentDidMount.calledOnce);
   t.is(GeneratedParm.prototype.constructor, React.PureComponent.prototype.constructor);
+
+  t.true(options.getInitialState.calledOnce);
 });
 
 test('if createComponent will create a component class when no options are passed', (t) => {
@@ -131,6 +137,156 @@ test('if createComponent will create a component class when no options are passe
   } catch (error) {
     t.fail(error);
   }
+});
+
+test('if createComponent will create a pure component class with derived values', (t) => {
+  const componentDidMount = sinon.spy();
+
+  const values = {
+    foo: 'quz'
+  };
+
+  componentDidMount.resetHistory();
+
+  const Generated = function Generated(props, instance) {
+    t.is(instance.foo, values.foo);
+
+    return <div>{instance.foo}</div>;
+  };
+
+  Generated.propTypes = {};
+  Generated.defaultProps = {};
+
+  const options = {
+    componentDidMount,
+    getInitialValues: sinon.stub().callsFake(() => values),
+    isPure: true
+  };
+
+  const GeneratedParm = index.createComponent(Generated, options);
+
+  t.is(GeneratedParm.displayName, Generated.name);
+  t.is(GeneratedParm.propTypes, Generated.propTypes);
+  t.is(GeneratedParm.defaultProps, Generated.defaultProps);
+
+  const div = document.createElement('div');
+
+  ReactDOM.render(<GeneratedParm foo="buzz" />, div);
+
+  t.true(componentDidMount.calledOnce);
+  t.is(GeneratedParm.prototype.constructor, React.PureComponent.prototype.constructor);
+
+  t.true(options.getInitialValues.calledOnce);
+});
+
+test('if createComponent will create a pure component class without derived values if they are not returned', (t) => {
+  const componentDidMount = sinon.spy();
+
+  const values = null;
+
+  componentDidMount.resetHistory();
+
+  const Generated = function Generated(props, instance) {
+    t.is(instance.foo, undefined);
+
+    return <div>{instance.foo}</div>;
+  };
+
+  Generated.propTypes = {};
+  Generated.defaultProps = {};
+
+  const options = {
+    componentDidMount,
+    getInitialValues: sinon.stub().callsFake(() => values),
+    isPure: true
+  };
+
+  const GeneratedParm = index.createComponent(Generated, options);
+
+  t.is(GeneratedParm.displayName, Generated.name);
+  t.is(GeneratedParm.propTypes, Generated.propTypes);
+  t.is(GeneratedParm.defaultProps, Generated.defaultProps);
+
+  const div = document.createElement('div');
+
+  ReactDOM.render(<GeneratedParm foo="buzz" />, div);
+
+  t.true(componentDidMount.calledOnce);
+  t.is(GeneratedParm.prototype.constructor, React.PureComponent.prototype.constructor);
+
+  t.true(options.getInitialValues.calledOnce);
+});
+
+test('if createComponent will create a pure component class without derived values if they are not an object', (t) => {
+  const componentDidMount = sinon.spy();
+
+  const values = 'values';
+
+  componentDidMount.resetHistory();
+
+  const Generated = function Generated(props, instance) {
+    t.is(instance.foo, undefined);
+
+    return <div>{instance.foo}</div>;
+  };
+
+  Generated.propTypes = {};
+  Generated.defaultProps = {};
+
+  const options = {
+    componentDidMount,
+    getInitialValues: sinon.stub().callsFake(() => values),
+    isPure: true
+  };
+
+  const GeneratedParm = index.createComponent(Generated, options);
+
+  t.is(GeneratedParm.displayName, Generated.name);
+  t.is(GeneratedParm.propTypes, Generated.propTypes);
+  t.is(GeneratedParm.defaultProps, Generated.defaultProps);
+
+  const div = document.createElement('div');
+
+  ReactDOM.render(<GeneratedParm foo="buzz" />, div);
+
+  t.true(componentDidMount.calledOnce);
+  t.is(GeneratedParm.prototype.constructor, React.PureComponent.prototype.constructor);
+
+  t.true(options.getInitialValues.calledOnce);
+});
+
+test('if createComponent will create a pure component class calling onConstruct when passed', (t) => {
+  const componentDidMount = sinon.spy();
+
+  componentDidMount.resetHistory();
+
+  const Generated = function Generated(props, instance) {
+    return <div />;
+  };
+
+  Generated.propTypes = {};
+  Generated.defaultProps = {};
+
+  const options = {
+    componentDidMount,
+    isPure: true,
+    onConstruct: sinon.spy()
+  };
+
+  const GeneratedParm = index.createComponent(Generated, options);
+
+  t.is(GeneratedParm.displayName, Generated.name);
+  t.is(GeneratedParm.propTypes, Generated.propTypes);
+  t.is(GeneratedParm.defaultProps, Generated.defaultProps);
+
+  const div = document.createElement('div');
+
+  ReactDOM.render(<GeneratedParm foo="buzz" />, div);
+
+  t.true(componentDidMount.calledOnce);
+  t.is(GeneratedParm.prototype.constructor, React.PureComponent.prototype.constructor);
+
+  t.true(options.onConstruct.calledOnce);
 });
 
 test('if createComponentRef will create a ref method that assigns the component ref to the instance', (t) => {
@@ -255,6 +411,64 @@ test('if createRender will log the error when not a valid instance', (t) => {
 
   t.true(stub.calledOnce);
   t.true(stub.calledWith('render'));
+
+  stub.restore();
+});
+
+test('if createPropType will create a custom prop type validator for a standard prop', (t) => {
+  const handler = sinon.spy();
+
+  const result = index.createPropType(handler);
+
+  t.is(typeof result, 'function');
+  t.is(typeof result.isRequired, 'function');
+
+  const args = [{key: 'value'}, 'key', 'Component'];
+
+  result(...args);
+
+  t.true(handler.calledOnce);
+  t.true(
+    handler.calledWith({
+      component: args[2],
+      key: args[1],
+      name: args[1],
+      path: args[1],
+      props: args[0],
+      value: args[0][args[1]]
+    })
+  );
+});
+
+test('if createValue will create a value based on a method that receives the instance', (t) => {
+  const getLength = (instance) => {
+    t.is(instance.props.bar, 'baz');
+
+    return instance.props.bar.length;
+  };
+
+  class Foo extends React.Component {
+    length = index.createValue(this, getLength);
+
+    render() {
+      t.is(this.length, 3);
+
+      return <div />;
+    }
+  }
+
+  const div = document.createElement('div');
+
+  ReactDOM.render(<Foo bar="baz" />, div);
+});
+
+test('if createValue will log the error when not a valid instance', (t) => {
+  const stub = sinon.stub(utils, 'logInvalidInstanceError');
+
+  index.createValue(() => {}, () => {});
+
+  t.true(stub.calledOnce);
+  t.true(stub.calledWith('value'));
 
   stub.restore();
 });
