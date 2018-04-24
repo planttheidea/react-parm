@@ -82,6 +82,9 @@ Generated.defaultProps = {
   foo: 'bar'
 };
 
+Generated.staticFoo = 'bar';
+Generated.staticBar = () => 'baz';
+
 const GeneratedParm = createComponent(Generated, {
   componentDidMount,
   getInitialState({props}) {
@@ -95,6 +98,9 @@ const GeneratedParm = createComponent(Generated, {
     console.log('constructed', instance);
   }
 });
+
+console.log('static value', GeneratedParm.staticFoo);
+console.log('static function', GeneratedParm.staticBar);
 
 const isFoo = createPropType((checker) => {
   const {component, name, value} = checker;

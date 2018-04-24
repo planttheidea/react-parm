@@ -5,6 +5,7 @@ import {findDOMNode} from 'react-dom';
 // utils
 import {
   IGNORED_COMPONENT_KEYS,
+  IGNORED_STATIC_KEYS,
   addPropTypeIsRequired,
   bindSetState,
   createRefCreator,
@@ -146,10 +147,10 @@ export const createComponent = (render, options) => {
   ParmComponent.prototype = Object.create(Constructor.prototype);
 
   ParmComponent.displayName = render.displayName || render.name || 'ParmComponent';
-  ParmComponent.propTypes = render.propTypes;
-  ParmComponent.contextTypes = render.contextTypes;
-  ParmComponent.childContextTypes = render.childContextTypes;
-  ParmComponent.defaultProps = render.defaultProps;
+
+  Object.keys(render).forEach(
+    (staticKey) => !IGNORED_STATIC_KEYS[staticKey] && (ParmComponent[staticKey] = render[staticKey])
+  );
 
   return ParmComponent;
 };
