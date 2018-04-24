@@ -14,6 +14,13 @@ export const IGNORED_COMPONENT_KEYS = {
 };
 
 /**
+ * @constant {Object} IGNORED_STATIC_KEYS keys to ignore when assigning statics to a component
+ */
+export const IGNORED_STATIC_KEYS = {
+  displayName: true
+};
+
+/**
  * @function addPropTypeIsRequired
  *
  * @description

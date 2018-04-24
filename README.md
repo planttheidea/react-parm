@@ -207,6 +207,8 @@ The component will be parmed with `createRender`, all methods passed in `options
   * Expects an object to be returned, where a return of `{foo: 'bar'}` will result in `instance.foo` being `"bar"`
 * `onConstruct` => If a method is passed, then it is called with the instance as parameter at the end of construction
 
+**NOTE**: Any additional static values / methods you apply to the render component will be re-assigned to the parmed component.
+
 #### createComponentRef
 
 Create a method that will assign the Component requested to an instance value using a ref callback.

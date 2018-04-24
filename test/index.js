@@ -289,6 +289,29 @@ test('if createComponent will create a pure component class calling onConstruct 
   t.true(options.onConstruct.calledOnce);
 });
 
+test('if createComponent will reassign static values and functions to the generated component', (t) => {
+  const Generated = ({foo}) => <div>{foo}</div>;
+
+  Generated.propTypes = {
+    foo: PropTypes.string
+  };
+
+  Generated.value = 'value';
+  Generated.fn = () => {};
+
+  try {
+    const GeneratedParm = index.createComponent(Generated);
+
+    t.is(GeneratedParm.propTypes, Generated.propTypes);
+    t.is(GeneratedParm.value, Generated.value);
+    t.is(GeneratedParm.fn, Generated.fn);
+
+    t.pass();
+  } catch (error) {
+    t.fail(error);
+  }
+});
+
 test('if createComponentRef will create a ref method that assigns the component ref to the instance', (t) => {
   class OtherValue extends React.Component {
     render() {

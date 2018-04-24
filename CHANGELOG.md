@@ -1,5 +1,9 @@
 # react-parm CHANGELOG
 
+## 2.3.0
+
+* Add support in `createComponent` for re-assigning any static value / method applied to the source component
+
 ## 2.2.0
 
 * Add [`createValue`](README.md#createvalue) method
