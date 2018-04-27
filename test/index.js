@@ -312,6 +312,28 @@ test('if createComponent will reassign static values and functions to the genera
   }
 });
 
+test('if createComponent will create a component class with render methods if they have isRender set to true', (t) => {
+  const Generated = (props, {renderProps}) => renderProps(props);
+
+  Generated.propTypes = {
+    foo: PropTypes.string
+  };
+
+  const renderProps = ({foo}) => <div>{foo}</div>;
+
+  renderProps.isRender = true;
+
+  const GeneratedParm = index.createComponent(Generated, {
+    renderProps
+  });
+
+  const div = document.createElement('div');
+
+  ReactDOM.render(<GeneratedParm foo="foo" />, div);
+
+  t.is(div.innerHTML, '<div>foo</div>');
+});
+
 test('if createComponentRef will create a ref method that assigns the component ref to the instance', (t) => {
   class OtherValue extends React.Component {
     render() {

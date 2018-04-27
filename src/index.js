@@ -123,7 +123,10 @@ export const createComponent = (render, options) => {
 
     for (let key in options) {
       if (!IGNORED_COMPONENT_KEYS[key]) {
-        this[key] = typeof options[key] === 'function' ? createMethod(this, options[key]) : options[key];
+        this[key] =
+          typeof options[key] === 'function'
+            ? options[key].isRender ? createRender(this, options[key]) : createMethod(this, options[key])
+            : options[key];
       }
     }
 

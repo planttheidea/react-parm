@@ -72,10 +72,20 @@ const onClickIncrementCounter = (instance, [event]) => {
   }));
 };
 
+const renderProps = ({foo}) => <div>{foo}</div>;
+
+renderProps.isRender = true;
+
 const Generated = (props, instance) => {
   console.log('render instance', instance);
 
-  return <Span>Props: {JSON.stringify(props)}</Span>;
+  return (
+    <div>
+      <Span>Props: {JSON.stringify(props)}</Span>
+
+      {instance.renderProps(props)}
+    </div>
+  );
 };
 
 Generated.defaultProps = {
@@ -96,7 +106,8 @@ const GeneratedParm = createComponent(Generated, {
   isPure: true,
   onConstruct(instance) {
     console.log('constructed', instance);
-  }
+  },
+  renderProps
 });
 
 console.log('static value', GeneratedParm.staticFoo);
