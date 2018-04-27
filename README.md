@@ -199,7 +199,22 @@ export default createComponent(DoTheThing, {
 });
 ```
 
-The component will be parmed with `createRender`, all methods passed in `options` will be parmed with `createMethod`, and all other values will be assigned to the instance. There are also two additional properties that are treated outside the context of assignment to the instance:
+The component will be parmed with `createRender`, and the properties passed in `options` will be handled as follows:
+
+* Lifecycle methods will be parmed with `createMethod`
+* Instance methods will be parmed with `createMethod`, unless it has a static property of `isRender` set to `true`, in which case it will be parmed with `createRender`
+
+  * Example of `isRender` application:
+
+  ```javascript
+  const renderProps = ({ foo }) => <div>{foo}</div>;
+
+  renderProps.isRender = true;
+  ```
+
+* Instance values will be assigned to the instance
+
+There are also two additional properties that are treated outside the context of assignment to the instance:
 
 * `isPure` => should `PureComponent` be used to construct the underlying component class instead of `Component` (defaults to `false`)
 * `getInitialState` => if a method is passed, then it is parmed and used to derive the initial state instead of the static `state` property

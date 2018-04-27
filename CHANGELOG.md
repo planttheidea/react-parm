@@ -1,5 +1,9 @@
 # react-parm CHANGELOG
 
+## 2.4.0
+
+* Add support for additional render methods via `createComponent` by setting static `isRender` property to `true` on the method
+
 ## 2.3.0
 
 * Add support in `createComponent` for re-assigning any static value / method applied to the source component
