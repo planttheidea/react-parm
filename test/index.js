@@ -313,18 +313,18 @@ test('if createComponent will reassign static values and functions to the genera
 });
 
 test('if createComponent will create a component class with render methods if they have isRender set to true', (t) => {
-  const Generated = (props, {renderProps}) => renderProps(props);
+  const Generated = (props, {renderer}) => renderer(props);
 
   Generated.propTypes = {
     foo: PropTypes.string
   };
 
-  const renderProps = ({foo}) => <div>{foo}</div>;
+  const renderer = ({foo}) => <div>{foo}</div>;
 
-  renderProps.isRender = true;
+  renderer.isRender = true;
 
   const GeneratedParm = index.createComponent(Generated, {
-    renderProps
+    renderer
   });
 
   const div = document.createElement('div');
@@ -332,6 +332,34 @@ test('if createComponent will create a component class with render methods if th
   ReactDOM.render(<GeneratedParm foo="foo" />, div);
 
   t.is(div.innerHTML, '<div>foo</div>');
+});
+
+test('if createComponent will create a component class with render props methods if they have isRenderProps set to true', (t) => {
+  const RenderProp = ({children}) => <div>{children({render: 'prop'})}</div>;
+
+  RenderProp.propTypes = {
+    children: PropTypes.func.isRequired
+  };
+
+  const renderPropMethod = (props, instance) => <span>Render prop: {props.render}</span>;
+
+  renderPropMethod.isRenderProps = true;
+
+  const Generated = (props, instance) => <RenderProp>{instance.renderPropMethod}</RenderProp>;
+
+  Generated.propTypes = {
+    foo: PropTypes.string
+  };
+
+  const GeneratedParm = index.createComponent(Generated, {
+    renderPropMethod
+  });
+
+  const div = document.createElement('div');
+
+  ReactDOM.render(<GeneratedParm foo="foo" />, div);
+
+  t.is(div.innerHTML, '<div><span>Render prop: prop</span></div>');
 });
 
 test('if createComponentRef will create a ref method that assigns the component ref to the instance', (t) => {
@@ -456,6 +484,46 @@ test('if createRender will log the error when not a valid instance', (t) => {
 
   t.true(stub.calledOnce);
   t.true(stub.calledWith('render'));
+
+  stub.restore();
+});
+
+test('if createRenderProps will create a render props method that receives props and the instance', (t) => {
+  const passedProps = {passed: 'props'};
+
+  const RenderProp = ({children}) => <div>{children(passedProps)}</div>;
+
+  RenderProp.propTypes = {
+    children: PropTypes.func.isRequired
+  };
+
+  const renderProps = (props, instance) => {
+    t.is(props, passedProps);
+    t.is(instance.props.bar, 'baz');
+
+    return null;
+  };
+
+  class Foo extends React.Component {
+    renderProps = index.createRenderProps(this, renderProps);
+
+    render() {
+      return <RenderProp>{this.renderProps}</RenderProp>;
+    }
+  }
+
+  const div = document.createElement('div');
+
+  ReactDOM.render(<Foo bar="baz" />, div);
+});
+
+test('if createRenderProps will log the error when not a valid instance', (t) => {
+  const stub = sinon.stub(utils, 'logInvalidInstanceError');
+
+  index.createRenderProps(() => {}, () => {});
+
+  t.true(stub.calledOnce);
+  t.true(stub.calledWith('render props'));
 
   stub.restore();
 });

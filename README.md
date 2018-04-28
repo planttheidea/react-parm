@@ -121,9 +121,9 @@ export default class App extends Component {
 
 #### createRender
 
-Create a functional render method, which will receive the `props` as the first parameter, and the full instance as the second parameter.
+Create a functional render method, which will receive the `props` as the first parameter, the full instance as the second parameter, and any arguments passed to it as the third parameter.
 
-_createRender(instance: ReactComponent, render: function): (props: Object, instance: ReactComponent) => ReactElement_
+_createRender(instance: ReactComponent, render: function): (props: Object, instance: ReactComponent, args: Array<any>) => ReactElement_
 
 ```javascript
 import React from "react";
@@ -150,13 +150,51 @@ export default class App extends Component {
   };
 
   componentDidMount = createMethod(this, componentDidMount);
-  onClickDoThing = createMethod(this, onClickDoThing, true);
 
   render = createRender(this, DoTheThing);
 }
 ```
 
 **NOTE**: The difference in signature from `createMethod` is both for common-use purposes, but also because it allows linting tools to appropriately lint for `PropTypes`.
+
+#### createRenderProps
+
+Create a functional [render props method](https://reactjs.org/docs/render-props.html), which will receive the `props` passed to it as the first parameter, the full instance as the second parameter, and any additional arguments passed to it as the third parameter.
+
+_createRenderProps(instance: ReactComponent, render: function): (props: Object, instance: ReactComponent, remainingArgs: Array<any>) => ReactElement_
+
+```javascript
+import React from "react";
+import { createMethod, createRenderProps } from "react-parm";
+
+const RenderPropComponent = ({ children }) => (
+  <div>{children({ stuff: "passed" })}</div>
+);
+
+const renderProps = (props, instance) => (
+  <div>
+    {props.stuff}
+
+    <button onClick={instance.props.doThing}>Do the thing</button>
+  </div>
+);
+
+export const DoTheThing = ({ doThing }) => (
+  <RenderPropComponent>{renderProps}</RenderPropComponent>
+);
+
+export default class App extends Component {
+  state = {
+    isMounted: false
+  };
+
+  renderProps = createRenderProps(this, renderProps);
+
+  render = createRender(this, DoTheThing);
+}
+```
+
+**NOTE**: The main difference between `createRender` and `createRenderProps` is the first `props` argument. In the case of `createRender`, it is the `props` of the `instance` the method is bound to, whereas in the case of `createRenderProps` it is the `props` argument passed to it directly.
 
 #### createComponent
 
@@ -202,15 +240,23 @@ export default createComponent(DoTheThing, {
 The component will be parmed with `createRender`, and the properties passed in `options` will be handled as follows:
 
 * Lifecycle methods will be parmed with `createMethod`
-* Instance methods will be parmed with `createMethod`, unless it has a static property of `isRender` set to `true`, in which case it will be parmed with `createRender`
+* Instance methods will be parmed with `createMethod`, unless:
 
-  * Example of `isRender` application:
+  * It has a static property of `isRender` set to `true`, in which case it will be parmed with `createRender`. Example:
 
-  ```javascript
-  const renderProps = ({ foo }) => <div>{foo}</div>;
+    ```javascript
+    const renderer = ({ foo }) => <div>{foo}</div>;
 
-  renderProps.isRender = true;
-  ```
+    renderer.isRender = true;
+    ```
+
+  * It has a static property of `isRenderProps` set to `true`, in which case it will be parmed with `createRenderProps`. Example:
+
+    ```javascript
+    const renderProps = ({ children }) => <div>{children({child: 'props')}</div>;
+
+    renderProps.isRenderProps = true;
+    ```
 
 * Instance values will be assigned to the instance
 

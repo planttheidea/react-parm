@@ -72,9 +72,22 @@ const onClickIncrementCounter = (instance, [event]) => {
   }));
 };
 
-const renderProps = ({foo}) => <div>{foo}</div>;
+const RenderProp = ({children}) => <div>{children({render: 'prop'})}</div>;
 
-renderProps.isRender = true;
+RenderProp.propTypes = {
+  children: PropTypes.func.isRequired
+};
+
+const renderPropMethod = (props, instance) => {
+  console.group('render props');
+  console.log('render props', props);
+  console.log('instance props', instance.props);
+  console.groupEnd('render props');
+
+  return <span>Render prop: {props.render}</span>;
+};
+
+renderPropMethod.isRenderProps = true;
 
 const Generated = (props, instance) => {
   console.log('render instance', instance);
@@ -83,7 +96,7 @@ const Generated = (props, instance) => {
     <div>
       <Span>Props: {JSON.stringify(props)}</Span>
 
-      {instance.renderProps(props)}
+      <RenderProp>{instance.renderPropMethod}</RenderProp>
     </div>
   );
 };
@@ -107,7 +120,7 @@ const GeneratedParm = createComponent(Generated, {
   onConstruct(instance) {
     console.log('constructed', instance);
   },
-  renderProps
+  renderPropMethod
 });
 
 console.log('static value', GeneratedParm.staticFoo);

@@ -79,8 +79,23 @@ export const createMethod = (instance, method, ...extraArgs) =>
  */
 export const createRender = (instance, render) =>
   isClassComponent(instance)
-    ? bindSetState(instance) && (() => render.call(instance, instance.props, instance))
+    ? bindSetState(instance) && ((...args) => render.call(instance, instance.props, instance, args))
     : logInvalidInstanceError('render');
+
+/**
+ * @function createRenderProps
+ *
+ * @description
+ * create a render props method, where the props passed and the instance it is rendered in are passed as props to it
+ *
+ * @param {ReactComponent} instance the instance the method is assigned to
+ * @param {function} renderProps the render props method
+ * @returns {function(Object): ReactElement} the method with the props and instance passed as values
+ */
+export const createRenderProps = (instance, renderProps) =>
+  isClassComponent(instance)
+    ? bindSetState(instance) && ((props, ...restOfArgs) => renderProps.call(instance, props, instance, restOfArgs))
+    : logInvalidInstanceError('render props');
 
 /**
  * @function createValue
@@ -125,7 +140,9 @@ export const createComponent = (render, options) => {
       if (!IGNORED_COMPONENT_KEYS[key]) {
         this[key] =
           typeof options[key] === 'function'
-            ? options[key].isRender ? createRender(this, options[key]) : createMethod(this, options[key])
+            ? options[key].isRender
+              ? createRender(this, options[key])
+              : options[key].isRenderProps ? createRenderProps(this, options[key]) : createMethod(this, options[key])
             : options[key];
       }
     }
