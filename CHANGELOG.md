@@ -1,5 +1,11 @@
 # react-parm CHANGELOG
 
+## 2.5.0
+
+* Add support for [render props](https://reactjs.org/docs/render-props.html) instance methods via `createComponent` by setting static `isRenderProps` property to `true` on the method
+* Add [`createRenderProps`](README.md#createrenderprops) method
+* Add passing of `args` for `createRender` method
+
 ## 2.4.0
 
 * Add support for additional render methods via `createComponent` by setting static `isRender` property to `true` on the method
