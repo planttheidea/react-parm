@@ -41,7 +41,7 @@ test('if createComponent will create a standard component class with static stat
   const componentDidMount = sinon.spy();
 
   const state = {
-    foo: 'quz'
+    foo: 'quz',
   };
 
   const Generated = function Generated(props, instance) {
@@ -54,11 +54,11 @@ test('if createComponent will create a standard component class with static stat
 
   Generated.propTypes = {
     bar: PropTypes.string,
-    foo: PropTypes.string
+    foo: PropTypes.string,
   };
 
   Generated.defaultProps = {
-    bar: 'baz'
+    bar: 'baz',
   };
 
   const value = {};
@@ -66,7 +66,7 @@ test('if createComponent will create a standard component class with static stat
   const GeneratedParm = index.createComponent(Generated, {
     componentDidMount,
     state,
-    value
+    value,
   });
 
   t.is(GeneratedParm.displayName, Generated.displayName);
@@ -85,7 +85,7 @@ test('if createComponent will create a pure component class with derived state',
   const componentDidMount = sinon.spy();
 
   const state = {
-    foo: 'quz'
+    foo: 'quz',
   };
 
   const Generated = function Generated(props, instance) {
@@ -100,7 +100,7 @@ test('if createComponent will create a pure component class with derived state',
   const options = {
     componentDidMount,
     getInitialState: sinon.stub().callsFake(() => state),
-    isPure: true
+    isPure: true,
   };
 
   const GeneratedParm = index.createComponent(Generated, options);
@@ -125,7 +125,7 @@ test('if createComponent will create a component class when no options are passe
   delete Generated.name;
 
   Generated.propTypes = {
-    foo: PropTypes.string
+    foo: PropTypes.string,
   };
 
   try {
@@ -143,7 +143,7 @@ test('if createComponent will create a pure component class with derived values'
   const componentDidMount = sinon.spy();
 
   const values = {
-    foo: 'quz'
+    foo: 'quz',
   };
 
   componentDidMount.resetHistory();
@@ -160,7 +160,7 @@ test('if createComponent will create a pure component class with derived values'
   const options = {
     componentDidMount,
     getInitialValues: sinon.stub().callsFake(() => values),
-    isPure: true
+    isPure: true,
   };
 
   const GeneratedParm = index.createComponent(Generated, options);
@@ -198,7 +198,7 @@ test('if createComponent will create a pure component class without derived valu
   const options = {
     componentDidMount,
     getInitialValues: sinon.stub().callsFake(() => values),
-    isPure: true
+    isPure: true,
   };
 
   const GeneratedParm = index.createComponent(Generated, options);
@@ -236,7 +236,7 @@ test('if createComponent will create a pure component class without derived valu
   const options = {
     componentDidMount,
     getInitialValues: sinon.stub().callsFake(() => values),
-    isPure: true
+    isPure: true,
   };
 
   const GeneratedParm = index.createComponent(Generated, options);
@@ -270,7 +270,7 @@ test('if createComponent will create a pure component class calling onConstruct 
   const options = {
     componentDidMount,
     isPure: true,
-    onConstruct: sinon.spy()
+    onConstruct: sinon.spy(),
   };
 
   const GeneratedParm = index.createComponent(Generated, options);
@@ -293,7 +293,7 @@ test('if createComponent will reassign static values and functions to the genera
   const Generated = ({foo}) => <div>{foo}</div>;
 
   Generated.propTypes = {
-    foo: PropTypes.string
+    foo: PropTypes.string,
   };
 
   Generated.value = 'value';
@@ -316,7 +316,7 @@ test('if createComponent will create a component class with render methods if th
   const Generated = (props, {renderer}) => renderer(props);
 
   Generated.propTypes = {
-    foo: PropTypes.string
+    foo: PropTypes.string,
   };
 
   const renderer = ({foo}) => <div>{foo}</div>;
@@ -324,7 +324,7 @@ test('if createComponent will create a component class with render methods if th
   renderer.isRender = true;
 
   const GeneratedParm = index.createComponent(Generated, {
-    renderer
+    renderer,
   });
 
   const div = document.createElement('div');
@@ -338,7 +338,7 @@ test('if createComponent will create a component class with render props methods
   const RenderProp = ({children}) => <div>{children({render: 'prop'})}</div>;
 
   RenderProp.propTypes = {
-    children: PropTypes.func.isRequired
+    children: PropTypes.func.isRequired,
   };
 
   const renderPropMethod = (props, instance) => <span>Render prop: {props.render}</span>;
@@ -348,11 +348,11 @@ test('if createComponent will create a component class with render props methods
   const Generated = (props, instance) => <RenderProp>{instance.renderPropMethod}</RenderProp>;
 
   Generated.propTypes = {
-    foo: PropTypes.string
+    foo: PropTypes.string,
   };
 
   const GeneratedParm = index.createComponent(Generated, {
-    renderPropMethod
+    renderPropMethod,
   });
 
   const div = document.createElement('div');
@@ -360,6 +360,21 @@ test('if createComponent will create a component class with render props methods
   ReactDOM.render(<GeneratedParm foo="foo" />, div);
 
   t.is(div.innerHTML, '<div><span>Render prop: prop</span></div>');
+});
+
+test('if createComponent will curry the calls when render is not a function', (t) => {
+  const componentDidMount = () => console.log('mounted');
+  const componentDidUpdate = () => console.log('updated');
+
+  const Result = index.createComponent({componentDidMount})()({componentDidUpdate})()((props) => (
+    <div>{JSON.stringify(props)}</div>
+  ));
+
+  const div = document.createElement('div');
+
+  ReactDOM.render(<Result foo="foo" />, div);
+
+  t.is(div.innerHTML, '<div>{"foo":"foo"}</div>');
 });
 
 test('if createComponentRef will create a ref method that assigns the component ref to the instance', (t) => {
@@ -494,7 +509,7 @@ test('if createRenderProps will create a render props method that receives props
   const RenderProp = ({children}) => <div>{children(passedProps)}</div>;
 
   RenderProp.propTypes = {
-    children: PropTypes.func.isRequired
+    children: PropTypes.func.isRequired,
   };
 
   const renderProps = (props, instance) => {
@@ -548,7 +563,7 @@ test('if createPropType will create a custom prop type validator for a standard 
       name: args[1],
       path: args[1],
       props: args[0],
-      value: args[0][args[1]]
+      value: args[0][args[1]],
     })
   );
 });
@@ -606,7 +621,7 @@ test('if createPropType will create a custom prop type validator for a standard 
       name: args[1],
       path: args[1],
       props: args[0],
-      value: args[0][args[1]]
+      value: args[0][args[1]],
     })
   );
 });
@@ -631,7 +646,7 @@ test('if createPropType will create a custom prop type validator for a nested pr
       name: args[4].split('.')[0],
       path: args[4],
       props: args[0],
-      value: args[0][args[1]]
+      value: args[0][args[1]],
     })
   );
 });

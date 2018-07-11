@@ -4,19 +4,19 @@ Handle react classes with more functional purity
 
 ## Table of contents
 
-* [Summary](#summary)
-* [Usage](#usage)
-* [Methods](#methods)
-  * [createMethod](#createmethod)
-  * [createValue](#createvalue)
-  * [createRender](#createrender)
-  * [createComponent](#createcomponent)
-  * [createComponentRef](#createcomponentref)
-  * [createElementRef](#createelementref)
-  * [createCombinedRef](#createcombinedref)
-  * [createPropType](#createproptype)
-* [Why parm?](#why-parm)
-* [Development](#development)
+- [Summary](#summary)
+- [Usage](#usage)
+- [Methods](#methods)
+  - [createMethod](#createmethod)
+  - [createValue](#createvalue)
+  - [createRender](#createrender)
+  - [createComponent](#createcomponent)
+  - [createComponentRef](#createcomponentref)
+  - [createElementRef](#createelementref)
+  - [createCombinedRef](#createcombinedref)
+  - [createPropType](#createproptype)
+- [Why parm?](#why-parm)
+- [Development](#development)
 
 ## Summary
 
@@ -237,12 +237,20 @@ export default createComponent(DoTheThing, {
 });
 ```
 
+**NOTE**: Starting in version `2.6.0`, the `options` can be applied via currying:
+
+```javascript
+export default createComponent({ componentDidMount, onClickDoThing, state })(
+  DoTheThing
+);
+```
+
 The component will be parmed with `createRender`, and the properties passed in `options` will be handled as follows:
 
-* Lifecycle methods will be parmed with `createMethod`
-* Instance methods will be parmed with `createMethod`, unless:
+- Lifecycle methods will be parmed with `createMethod`
+- Instance methods will be parmed with `createMethod`, unless:
 
-  * It has a static property of `isRender` set to `true`, in which case it will be parmed with `createRender`. Example:
+  - It has a static property of `isRender` set to `true`, in which case it will be parmed with `createRender`. Example:
 
     ```javascript
     const renderer = ({ foo }) => <div>{foo}</div>;
@@ -250,7 +258,7 @@ The component will be parmed with `createRender`, and the properties passed in `
     renderer.isRender = true;
     ```
 
-  * It has a static property of `isRenderProps` set to `true`, in which case it will be parmed with `createRenderProps`. Example:
+  - It has a static property of `isRenderProps` set to `true`, in which case it will be parmed with `createRenderProps`. Example:
 
     ```javascript
     const renderProps = ({ children }) => <div>{children({child: 'props')}</div>;
@@ -258,15 +266,15 @@ The component will be parmed with `createRender`, and the properties passed in `
     renderProps.isRenderProps = true;
     ```
 
-* Instance values will be assigned to the instance
+- Instance values will be assigned to the instance
 
 There are also two additional properties that are treated outside the context of assignment to the instance:
 
-* `isPure` => should `PureComponent` be used to construct the underlying component class instead of `Component` (defaults to `false`)
-* `getInitialState` => if a method is passed, then it is parmed and used to derive the initial state instead of the static `state` property
-* `getInitialValues` => If a method is passed, then it is parmed and used to derive initial instance values
-  * Expects an object to be returned, where a return of `{foo: 'bar'}` will result in `instance.foo` being `"bar"`
-* `onConstruct` => If a method is passed, then it is called with the instance as parameter at the end of construction
+- `isPure` => should `PureComponent` be used to construct the underlying component class instead of `Component` (defaults to `false`)
+- `getInitialState` => if a method is passed, then it is parmed and used to derive the initial state instead of the static `state` property
+- `getInitialValues` => If a method is passed, then it is parmed and used to derive initial instance values
+  - Expects an object to be returned, where a return of `{foo: 'bar'}` will result in `instance.foo` being `"bar"`
+- `onConstruct` => If a method is passed, then it is called with the instance as parameter at the end of construction
 
 **NOTE**: Any additional static values / methods you apply to the render component will be re-assigned to the parmed component.
 
@@ -380,9 +388,9 @@ Please note that usage may result in different values for these keys, based on w
 
 When used in `arrayOf` or `objectOf`:
 
-* `key` represents the nested key being validated
-* `name` represents the name of the prop that was passed
-* `path` represents the full path being validated
+- `key` represents the nested key being validated
+- `name` represents the name of the prop that was passed
+- `path` represents the full path being validated
 
 Example:
 
@@ -411,15 +419,15 @@ PARM is an acronym, standing for Partial-Application React Method. Also, why not
 
 Standard stuff, clone the repo and `npm install` dependencies. The npm scripts available:
 
-* `build` => run rollup to build development and production `dist` files
-* `dev` => run webpack dev server to run example app / playground
-* `lint` => run ESLint against all files in the `src` folder
-* `lint: fix` => runs `lint` with `--fix`
-* `prepublish` => runs `prepublish:compile` when publishing
-* `prepublish:compile` => run `lint`, `test:coverage`, `transpile:lib`, `transpile:es`, and `build`
-* `test` => run AVA test functions with `NODE_ENV=test`
-* `test:coverage` => run `test` but with `nyc` for coverage checker
-* `test:watch` => run `test`, but with persistent watcher
-* `transpile:lib` => run babel against all files in `src` to create files in `lib`
-* `transpile:es` => run babel against all files in `src` to create files in `es`, preserving ES2015 modules (for
+- `build` => run rollup to build development and production `dist` files
+- `dev` => run webpack dev server to run example app / playground
+- `lint` => run ESLint against all files in the `src` folder
+- `lint: fix` => runs `lint` with `--fix`
+- `prepublish` => runs `prepublish:compile` when publishing
+- `prepublish:compile` => run `lint`, `test:coverage`, `transpile:lib`, `transpile:es`, and `build`
+- `test` => run AVA test functions with `NODE_ENV=test`
+- `test:coverage` => run `test` but with `nyc` for coverage checker
+- `test:watch` => run `test`, but with persistent watcher
+- `transpile:lib` => run babel against all files in `src` to create files in `lib`
+- `transpile:es` => run babel against all files in `src` to create files in `es`, preserving ES2015 modules (for
   [`pkg.module`](https://github.com/rollup/rollup/wiki/pkg.module))

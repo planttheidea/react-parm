@@ -1,5 +1,9 @@
 import PropTypes from 'prop-types';
-import React, {Component, PureComponent} from 'react';
+import React, {
+  Component,
+  PureComponent
+} from 'react';
+import {render} from 'react-dom';
 import {hot} from 'react-hot-loader';
 import styled from 'styled-components';
 
@@ -17,7 +21,7 @@ import {
 class Button extends PureComponent {
   static displayName = 'Button';
   static propTypes = {
-    children: PropTypes.node
+    children: PropTypes.node,
   };
 
   render() {
@@ -34,13 +38,13 @@ const StyledButton = styled(Button)`
 const SpanFunctional = ({children, ...props}) => <span {...props}>{children}</span>;
 
 SpanFunctional.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 };
 
 class Span extends PureComponent {
   static displayName = 'Span';
   static propTypes = {
-    children: PropTypes.node
+    children: PropTypes.node,
   };
 
   render = createRender(this, SpanFunctional);
@@ -57,7 +61,7 @@ const getInitialValues = (instance) => {
   console.log('initial values', instance);
 
   return {
-    length: instance.props.foo.length
+    length: instance.props.foo.length,
   };
 };
 
@@ -68,14 +72,14 @@ const onClickIncrementCounter = (instance, [event]) => {
   instance.random = Math.random();
 
   return instance.setState(({counter}) => ({
-    counter: counter + 1
+    counter: counter + 1,
   }));
 };
 
 const RenderProp = ({children}) => <div>{children({render: 'prop'})}</div>;
 
 RenderProp.propTypes = {
-  children: PropTypes.func.isRequired
+  children: PropTypes.func.isRequired,
 };
 
 const renderPropMethod = (props, instance) => {
@@ -102,7 +106,7 @@ const Generated = (props, instance) => {
 };
 
 Generated.defaultProps = {
-  foo: 'bar'
+  foo: 'bar',
 };
 
 Generated.staticFoo = 'bar';
@@ -112,7 +116,7 @@ const GeneratedParm = createComponent(Generated, {
   componentDidMount,
   getInitialState({props}) {
     return {
-      baz: props.foo
+      baz: props.foo,
     };
   },
   getInitialValues,
@@ -120,11 +124,18 @@ const GeneratedParm = createComponent(Generated, {
   onConstruct(instance) {
     console.log('constructed', instance);
   },
-  renderPropMethod
+  renderPropMethod,
 });
 
 console.log('static value', GeneratedParm.staticFoo);
 console.log('static function', GeneratedParm.staticBar);
+
+const GeneratedParmCurried = createComponent({componentDidMount})({getInitialValues})(Generated, {
+  getInitialState: ({props}) => ({baz: props.foo}),
+  isPure: true,
+  onConstruct: (instance) => console.log('constructed curried', instance),
+  renderPropMethod,
+});
 
 const isFoo = createPropType((checker) => {
   const {component, name, value} = checker;
@@ -150,11 +161,11 @@ class App extends Component {
   static propTypes = {
     custom: isFoo.isRequired,
     customArrayOf: PropTypes.arrayOf(isMultipleOfFoo).isRequired,
-    customObjectOf: PropTypes.objectOf(isMultipleOfFoo).isRequired
+    customObjectOf: PropTypes.objectOf(isMultipleOfFoo).isRequired,
   };
 
   state = {
-    counter: 0
+    counter: 0,
   };
 
   componentDidMount = createMethod(this, componentDidMount);
@@ -187,6 +198,11 @@ class App extends Component {
         <br />
 
         <GeneratedParm bar="baz" />
+
+        <br />
+
+        <GeneratedParmCurried bar="baz" />
+
         <br />
 
         <br />
