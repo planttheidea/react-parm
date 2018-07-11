@@ -39,7 +39,7 @@ test('if addPropTypeIsRequired will add an isRequired method to the propType tha
 
 test('if bindSetState will bind the setState method to the instance', (t) => {
   const instance = {
-    setState() {}
+    setState() {},
   };
 
   t.true(Object.prototype.hasOwnProperty.call(instance.setState, 'prototype'));
@@ -53,7 +53,7 @@ test('if bindSetState will not bind the setState method if it is already bound',
   const setState = function() {};
 
   const instance = {
-    setState
+    setState,
   };
 
   setState.bind = sinon.stub().callsFake(function() {
@@ -158,7 +158,7 @@ test('if createRefCreator will log the error if the component instance if not va
 
 test('if getNamespacedRef will return both the component and the element on the namespace', (t) => {
   const component = {
-    element: 'foo'
+    element: 'foo',
   };
   const stub = sinon.stub(ReactDOM, 'findDOMNode').returns(component.element);
 
@@ -171,7 +171,7 @@ test('if getNamespacedRef will return both the component and the element on the 
 
   t.deepEqual(result, {
     component,
-    element: component.element
+    element: component.element,
   });
 });
 

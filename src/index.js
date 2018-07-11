@@ -119,16 +119,33 @@ export const createValue = (instance, getValue, ...extraArgs) =>
  * @description
  * create a component from the render method and any options passed
  *
- * @param {function} render the function to render the component
- * @param {Object} [options={}] the options to render the component with
+ * @param {function|Object} render the function to render the component, or the options for future curried calls
+ * @param {Object} [passedOptions] the options to render the component with
  * @param {function} [getInitialState] the method to get the initial state with
  * @param {boolean} [isPure] is PureComponent used
  * @param {function} [onConstruct] a method to call when constructing the component
  * @param {Object} [state] the initial state
- * @returns {ReactComponent} the component class
+ * @returns {function|ReactComponent} the component class, or a curried call to itself
  */
-export const createComponent = (render, options) => {
-  const {getInitialState, getInitialValues, isPure, onConstruct, state} = options || {};
+export const createComponent = (render, passedOptions) => {
+  if (typeof render !== 'function') {
+    const options = render || {};
+
+    return (render, moreOptions) =>
+      typeof render === 'function'
+        ? createComponent(render, {
+          ...options,
+          ...(moreOptions || {}),
+        })
+        : createComponent({
+          ...options,
+          ...(render || {}),
+        });
+  }
+
+  const options = passedOptions || {};
+  const {getInitialState, getInitialValues, isPure, onConstruct, state} = options;
+
   const Constructor = isPure ? React.PureComponent : React.Component;
 
   function ParmComponent(initialProps) {
@@ -142,7 +159,9 @@ export const createComponent = (render, options) => {
           typeof options[key] === 'function'
             ? options[key].isRender
               ? createRender(this, options[key])
-              : options[key].isRenderProps ? createRenderProps(this, options[key]) : createMethod(this, options[key])
+              : options[key].isRenderProps
+                ? createRenderProps(this, options[key])
+                : createMethod(this, options[key])
             : options[key];
       }
     }
@@ -192,6 +211,6 @@ export const createPropType = (handler) =>
       name: fullKey ? fullKey.split(/(\.|\[)/)[0] : key,
       path: fullKey || key,
       props,
-      value: props[key]
+      value: props[key],
     })
   );

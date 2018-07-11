@@ -8,6 +8,7 @@
 coverage
 DEV_ONLY
 node_modules
+rollup.confg.js
 src
 test
 webpack
