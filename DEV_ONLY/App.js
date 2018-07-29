@@ -54,8 +54,9 @@ const componentDidMount = (instance) => console.log(instance);
 
 const shouldComponentUpdate = ({state}) => typeof state.counter === 'number' && state.counter % 2 === 0;
 
-const componentDidUpdate = (instance, [previousProps, previousState], [constantValue]) =>
+const componentDidUpdate = (instance, [previousProps, previousState], [constantValue]) => {
   console.log(previousProps, previousState, constantValue);
+};
 
 const getInitialValues = (instance) => {
   console.log('initial values', instance);
@@ -75,6 +76,8 @@ const onClickIncrementCounter = (instance, [event]) => {
     counter: counter + 1,
   }));
 };
+
+const onClickForceUpdate = ({forceUpdate}) => console.log('forcing update') || forceUpdate();
 
 const RenderProp = ({children}) => <div>{children({render: 'prop'})}</div>;
 
@@ -181,6 +184,7 @@ class App extends Component {
   });
   span = null;
 
+  onClickForceUpdate = createMethod(this, onClickForceUpdate);
   onClickIncrementCounter = createMethod(this, onClickIncrementCounter);
 
   render() {
@@ -194,6 +198,8 @@ class App extends Component {
         >
           Click to increment the counter
         </StyledButton>
+
+        <StyledButton onClick={this.onClickForceUpdate}>Click to force an update</StyledButton>
 
         <br />
 
