@@ -3,6 +3,11 @@ import React from 'react';
 import {findDOMNode} from 'react-dom';
 
 /**
+ * @const {Array<string>} BOUND_METHODS the methods to be bound to the instance
+ */
+export const BOUND_METHODS = ['forceUpdate', 'setState'];
+
+/**
  * @constant {Object} IGNORED_COMPONENT_KEYS keys to ignore when creating a component
  */
 export const IGNORED_COMPONENT_KEYS = {
@@ -36,18 +41,21 @@ export const addPropTypeIsRequired = (propType) =>
       : propType(props, key, component)) && propType;
 
 /**
- * @function bindSetState
+ * @function bindMethods
  *
  * @description
- * bind the setState method to the component instance to ensure it can be used in a functional way
+ * bind the methods to the component instance to ensure it can be used in a functional way
  *
- * @param {ReactComponent} instance the instance to bind setState to
+ * @param {ReactComponent} instance the instance to bind the method to
  * @returns {void}
  */
-export const bindSetState = (instance) =>
-  Object.prototype.hasOwnProperty.call(instance.setState, 'prototype')
-    ? (instance.setState = instance.setState.bind(instance))
-    : instance.setState;
+export const bindMethods = (instance) =>
+  BOUND_METHODS.map(
+    (method) =>
+      Object.prototype.hasOwnProperty.call(instance[method], 'prototype')
+        ? (instance[method] = instance[method].bind(instance))
+        : instance[method]
+  );
 
 /**
  * @function isClassComponent

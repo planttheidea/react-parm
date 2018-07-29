@@ -7,7 +7,7 @@ import {
   IGNORED_COMPONENT_KEYS,
   IGNORED_STATIC_KEYS,
   addPropTypeIsRequired,
-  bindSetState,
+  bindMethods,
   createRefCreator,
   getNamespacedRef,
   identity,
@@ -64,7 +64,7 @@ export const createElementRef = createRefCreator(findDOMNode);
  */
 export const createMethod = (instance, method, ...extraArgs) =>
   isClassComponent(instance)
-    ? bindSetState(instance) && ((...args) => method.call(instance, instance, args, extraArgs))
+    ? bindMethods(instance) && ((...args) => method.call(instance, instance, args, extraArgs))
     : logInvalidInstanceError('method');
 
 /**
@@ -79,7 +79,7 @@ export const createMethod = (instance, method, ...extraArgs) =>
  */
 export const createRender = (instance, render) =>
   isClassComponent(instance)
-    ? bindSetState(instance) && ((...args) => render.call(instance, instance.props, instance, args))
+    ? bindMethods(instance) && ((...args) => render.call(instance, instance.props, instance, args))
     : logInvalidInstanceError('render');
 
 /**
@@ -94,7 +94,7 @@ export const createRender = (instance, render) =>
  */
 export const createRenderProps = (instance, renderProps) =>
   isClassComponent(instance)
-    ? bindSetState(instance) && ((props, ...restOfArgs) => renderProps.call(instance, props, instance, restOfArgs))
+    ? bindMethods(instance) && ((props, ...restOfArgs) => renderProps.call(instance, props, instance, restOfArgs))
     : logInvalidInstanceError('render props');
 
 /**
@@ -110,7 +110,7 @@ export const createRenderProps = (instance, renderProps) =>
  */
 export const createValue = (instance, getValue, ...extraArgs) =>
   isClassComponent(instance)
-    ? bindSetState(instance) && getValue.call(instance, instance, extraArgs)
+    ? bindMethods(instance) && getValue.call(instance, instance, extraArgs)
     : logInvalidInstanceError('value');
 
 /**
