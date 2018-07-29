@@ -1,5 +1,9 @@
 # react-parm CHANGELOG
 
+## 2.6.1
+
+- Fix `forceUpdate` not being bound to the component instance
+
 ## 2.6.0
 
 - Add support for curried calls to `createComponent`

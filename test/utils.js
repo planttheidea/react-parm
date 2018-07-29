@@ -37,42 +37,42 @@ test('if addPropTypeIsRequired will add an isRequired method to the propType tha
   t.true(error instanceof Error);
 });
 
-test('if bindSetState will bind the setState method to the instance', (t) => {
+test('if bindMethods will bind each of the boundable methods to the instance', (t) => {
   const instance = {
+    forceUpdate() {},
     setState() {},
   };
 
-  t.true(Object.prototype.hasOwnProperty.call(instance.setState, 'prototype'));
-
-  utils.bindSetState(instance);
-
-  t.false(Object.prototype.hasOwnProperty.call(instance.setState, 'prototype'));
-});
-
-test('if bindSetState will not bind the setState method if it is already bound', (t) => {
-  const setState = function() {};
-
-  const instance = {
-    setState,
-  };
-
-  setState.bind = sinon.stub().callsFake(function() {
-    return Function.prototype.bind.apply(instance.setState, arguments);
+  Object.keys(instance).forEach((method) => {
+    t.true(Object.prototype.hasOwnProperty.call(instance[method], 'prototype'));
   });
 
-  utils.bindSetState(instance);
+  utils.bindMethods(instance);
 
-  t.true(setState.bind.calledOnce);
+  Object.keys(instance).forEach((method) => {
+    t.false(Object.prototype.hasOwnProperty.call(instance[method], 'prototype'));
+  });
+});
 
-  t.not(instance.setState, setState);
+test('if bindMethods will not bind the bindable methods if they arealready bound', (t) => {
+  const instance = {
+    forceUpdate() {},
+    setState() {},
+  };
 
-  const currentSetState = instance.setState;
+  const {forceUpdate, setState} = instance;
 
-  currentSetState.bind = sinon.spy();
+  instance.setState = instance.setState.bind(instance);
 
-  t.true(currentSetState.bind.notCalled);
+  forceUpdate.bind = sinon.stub().callsFake((...args) => Function.prototype.bind.apply(instance.forceUpdate, ...args));
 
-  t.is(instance.setState, currentSetState);
+  setState.bind = sinon.stub().callsFake((...args) => Function.prototype.bind.apply(instance.setState, ...args));
+
+  utils.bindMethods(instance);
+
+  t.true(forceUpdate.bind.calledOnce);
+
+  t.true(setState.bind.notCalled);
 });
 
 test('if isClassComponent will return false when the value is falsy', (t) => {
