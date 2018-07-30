@@ -213,8 +213,8 @@ export const state = {
 export const componentDidMount = ({ setState }) =>
   setState(() => ({ isMounted: true }));
 
-export const onClickDoThing = ({ props }, [event], [withStuff]) =>
-  props.doThing(event.currentTarget, withStuff);
+export const onClickDoThing = ({ props }, [event]) =>
+  props.doThing(event.currentTarget);
 
 export const DoTheThing = ({ doThing }, { onClickDoThing }) => (
   <div>
@@ -268,12 +268,12 @@ The component will be parmed with `createRender`, and the properties passed in `
 
 - Instance values will be assigned to the instance
 
-There are also two additional properties that are treated outside the context of assignment to the instance:
+There are also some additional properties that are treated outside the context of assignment to the instance:
 
-- `isPure` => should `PureComponent` be used to construct the underlying component class instead of `Component` (defaults to `false`)
 - `getInitialState` => if a method is passed, then it is parmed and used to derive the initial state instead of the static `state` property
 - `getInitialValues` => If a method is passed, then it is parmed and used to derive initial instance values
   - Expects an object to be returned, where a return of `{foo: 'bar'}` will result in `instance.foo` being `"bar"`
+- `isPure` => should `PureComponent` be used to construct the underlying component class instead of `Component` (defaults to `false`)
 - `onConstruct` => If a method is passed, then it is called with the instance as parameter at the end of construction
 
 **NOTE**: Any additional static values / methods you apply to the render component will be re-assigned to the parmed component.
