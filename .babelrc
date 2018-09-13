@@ -3,61 +3,61 @@
     "development": {
       "presets": [
         [
-          "env",
+          "@babel/preset-env",
           {
             "loose": true,
             "modules": false
           }
-        ],
-        "stage-2"
-      ]
+        ]
+      ],
+      "plugins": ["@babel/plugin-proposal-class-properties"]
     },
     "es": {
       "presets": [
         [
-          "env",
+          "@babel/preset-env",
           {
             "loose": true,
             "modules": false
           }
-        ],
-        "stage-2"
-      ]
+        ]
+      ],
+      "plugins": ["@babel/plugin-proposal-class-properties"]
     },
     "lib": {
       "presets": [
         [
-          "env",
+          "@babel/preset-env",
           {
             "loose": true
           }
-        ],
-        "stage-2"
-      ]
+        ]
+      ],
+      "plugins": ["@babel/plugin-proposal-class-properties"]
     },
     "production": {
       "presets": [
         [
-          "env",
+          "@babel/preset-env",
           {
             "loose": true,
             "modules": false
           }
-        ],
-        "stage-2"
-      ]
+        ]
+      ],
+      "plugins": ["@babel/plugin-proposal-class-properties"]
     },
     "test": {
       "presets": [
         [
-          "env",
+          "@babel/preset-env",
           {
             "loose": true
           }
         ],
-        "react",
-        "stage-2"
-      ]
+        "@babel/preset-react"
+      ],
+      "plugins": ["@babel/plugin-proposal-class-properties"]
     }
   }
 }

@@ -1,5 +1,9 @@
 # react-parm CHANGELOG
 
+## 2.7.0
+
+- Add `memoizer` option to `createMethod`
+
 ## 2.6.1
 
 - Fix `forceUpdate` not being bound to the component instance

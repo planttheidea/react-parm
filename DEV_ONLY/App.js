@@ -1,7 +1,9 @@
+// external dependencies
+import memoize from 'micro-memoize';
 import PropTypes from 'prop-types';
 import React, {
   Component,
-  PureComponent
+  PureComponent,
 } from 'react';
 import {render} from 'react-dom';
 import {hot} from 'react-hot-loader';
@@ -15,7 +17,7 @@ import {
   createMethod,
   createPropType,
   createRender,
-  createValue
+  createValue,
 } from '../src';
 
 class Button extends PureComponent {
@@ -66,15 +68,28 @@ const getInitialValues = (instance) => {
   };
 };
 
+const checkMemoize = (instanceIgnored, [message]) => console.log(message);
+
+checkMemoize.memoizer = (fn) => memoize(fn, {maxSize: 2});
+
 const onClickIncrementCounter = (instance, [event]) => {
   console.log(instance);
   console.log(event.currentTarget);
 
   instance.random = Math.random();
 
-  return instance.setState(({counter}) => ({
-    counter: counter + 1,
-  }));
+  return instance.setState(
+    ({counter}) => ({
+      counter: counter + 1,
+    }),
+    () => {
+      const thing = instance.state.counter % 2 === 0 ? 'even' : 'odd';
+
+      console.log(thing);
+
+      instance.checkMemoize(`Count is ${thing}.`);
+    }
+  );
 };
 
 const onClickForceUpdate = ({forceUpdate}) => console.log('forcing update') || forceUpdate();
@@ -184,6 +199,7 @@ class App extends Component {
   });
   span = null;
 
+  checkMemoize = createMethod(this, checkMemoize);
   onClickForceUpdate = createMethod(this, onClickForceUpdate);
   onClickIncrementCounter = createMethod(this, onClickIncrementCounter);
 
