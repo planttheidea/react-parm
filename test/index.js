@@ -1,5 +1,6 @@
 // test
 import test from 'ava';
+import memoize from 'micro-memoize';
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -366,7 +367,7 @@ test('if createComponent will curry the calls when render is not a function', (t
   const componentDidMount = () => console.log('mounted');
   const componentDidUpdate = () => console.log('updated');
 
-  const Result = index.createComponent({componentDidMount})()({componentDidUpdate})()((props) => (
+  const Result = index.createComponent()({componentDidMount})({componentDidUpdate})()((props) => (
     <div>{JSON.stringify(props)}</div>
   ));
 
@@ -429,7 +430,7 @@ test('if createMethod will create an instance method that accepts the instance a
   const spy = sinon.spy();
 
   class Value extends React.Component {
-    componentWillMount = index.createMethod(this, spy);
+    UNSAFE_componentWillMount = index.createMethod(this, spy);
 
     render() {
       t.true(spy.calledOnce);
@@ -449,11 +450,39 @@ test('if createMethod will create an instance method that accepts additional par
   const customValue = 'CUSTOM_VALUE';
 
   class Value extends React.Component {
-    componentWillMount = index.createMethod(this, spy, customValue);
+    UNSAFE_componentWillMount = index.createMethod(this, spy, customValue);
 
     render() {
       t.true(spy.calledOnce);
       t.true(spy.calledWith(this, [], [customValue]));
+
+      return <div />;
+    }
+  }
+
+  const div = document.createElement('div');
+
+  ReactDOM.render(<Value />, div);
+});
+
+test('if createMethod will create an instance method that is memoized by the memoizer option', (t) => {
+  const spy = sinon.spy();
+
+  spy.memoizer = memoize;
+
+  const args = [{}, 123, 'foo'];
+
+  class Value extends React.Component {
+    method = index.createMethod(this, spy);
+
+    render() {
+      this.method(...args);
+      this.method(...args);
+      this.method(...args);
+      this.method(...args);
+      this.method(...args);
+
+      t.true(spy.calledOnce);
 
       return <div />;
     }
@@ -599,31 +628,6 @@ test('if createValue will log the error when not a valid instance', (t) => {
   t.true(stub.calledWith('value'));
 
   stub.restore();
-});
-
-test('if createPropType will create a custom prop type validator for a standard prop', (t) => {
-  const handler = sinon.spy();
-
-  const result = index.createPropType(handler);
-
-  t.is(typeof result, 'function');
-  t.is(typeof result.isRequired, 'function');
-
-  const args = [{key: 'value'}, 'key', 'Component'];
-
-  result(...args);
-
-  t.true(handler.calledOnce);
-  t.true(
-    handler.calledWith({
-      component: args[2],
-      key: args[1],
-      name: args[1],
-      path: args[1],
-      props: args[0],
-      value: args[0][args[1]],
-    })
-  );
 });
 
 test('if createPropType will create a custom prop type validator for a nested prop', (t) => {

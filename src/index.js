@@ -12,7 +12,7 @@ import {
   getNamespacedRef,
   identity,
   isClassComponent,
-  logInvalidInstanceError
+  logInvalidInstanceError,
 } from './utils';
 
 /**
@@ -62,10 +62,21 @@ export const createElementRef = createRefCreator(findDOMNode);
  * @param {Array<any>} extraArgs additional args to pass to the method
  * @returns {function(...Array<any>): any} the method with the instance passed as value
  */
-export const createMethod = (instance, method, ...extraArgs) =>
-  isClassComponent(instance)
-    ? bindMethods(instance) && ((...args) => method.call(instance, instance, args, extraArgs))
-    : logInvalidInstanceError('method');
+export const createMethod = (instance, method, ...extraArgs) => {
+  if (!isClassComponent(instance)) {
+    return logInvalidInstanceError('method');
+  }
+
+  bindMethods(instance);
+
+  const {memoizer} = method;
+
+  delete method.memoizer;
+
+  const fn = (...args) => method.call(instance, instance, args, extraArgs);
+
+  return memoizer ? memoizer(fn) : fn;
+};
 
 /**
  * @function createRender

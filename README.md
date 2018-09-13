@@ -96,6 +96,18 @@ export default class App extends Component {
 }
 ```
 
+If you want this method to be memoized in an instance-specific way, you can assign the function that will memoize the method to the `memoizer` property on the function you create the method from.
+
+```javascript
+import memoize from "micro-memoize";
+
+const setCount = ({ setState }, [count]) => setState({ count });
+
+setCount.memoizer = memoize;
+```
+
+This will automatically wrap the method you pass to `createMethod` in the `memoizer`.
+
 #### createValue
 
 Create a value to assign to the instance based on a functional method which will receive the full instance as the first parameter.
