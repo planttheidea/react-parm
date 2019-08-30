@@ -1,5 +1,10 @@
 # react-parm CHANGELOG
 
+## 2.7.1
+
+- Reduce property access on component construction and on `bindMethod` check
+- Update dev dependencies for security
+
 ## 2.7.0
 
 - Add `memoizer` option to `createMethod`
