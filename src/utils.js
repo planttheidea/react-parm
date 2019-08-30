@@ -2,7 +2,7 @@
 import React from 'react';
 import {findDOMNode} from 'react-dom';
 
-const { hasOwnProperty } = Object.prototype;
+const {hasOwnProperty} = Object.prototype;
 
 /**
  * @const {Array<string>} BOUND_METHODS the methods to be bound to the instance
@@ -52,11 +52,10 @@ export const addPropTypeIsRequired = (propType) =>
  * @returns {void}
  */
 export const bindMethods = (instance) =>
-  BOUND_METHODS.map(
-    (method) =>
-      hasOwnProperty.call(instance[method], 'prototype')
-        ? (instance[method] = instance[method].bind(instance))
-        : instance[method]
+  BOUND_METHODS.map((method) =>
+    hasOwnProperty.call(instance[method], 'prototype')
+      ? (instance[method] = instance[method].bind(instance))
+      : instance[method]
   );
 
 /**
