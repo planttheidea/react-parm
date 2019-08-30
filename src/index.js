@@ -166,14 +166,16 @@ export const createComponent = (render, passedOptions) => {
 
     for (let key in options) {
       if (!IGNORED_COMPONENT_KEYS[key]) {
+        const option = options[key];
+
         this[key] =
-          typeof options[key] === 'function'
-            ? options[key].isRender
-              ? createRender(this, options[key])
-              : options[key].isRenderProps
-                ? createRenderProps(this, options[key])
-                : createMethod(this, options[key])
-            : options[key];
+          typeof option === 'function'
+            ? option.isRender
+              ? createRender(this, option)
+              : option.isRenderProps
+                ? createRenderProps(this, option)
+                : createMethod(this, option)
+            : option;
       }
     }
 
